@@ -3,72 +3,9 @@
 #![allow(dead_code)]
 use std::str::FromStr;
 use std::io::Read;
-use std::io::BufRead;
-use std::io::BufReader;
 
-
-/// 不要な行やコメントを削除したデータを提供する
-struct Vmlines<R> {
-    vm: BufReader<R>
-}
-
-impl<R: Read> Vmlines<R> {
-    fn new(stream: R) -> Vmlines<R> {
-        Vmlines {
-            vm: BufReader::new(stream)
-        }
-    }
-
-    /// 次の行を返す
-    fn next(&mut self) -> Option<String> {
-        let mut vmline = String::new();
-
-        // 不要な行や空白を除外する
-        loop {
-            vmline.clear();
-            if self.vm.read_line(&mut vmline).unwrap() == 0 {
-                return None;
-            }
-
-            let mut line = vmline.as_str();
-            let comment: Vec<_> = line.match_indices("//").collect();
-            if comment.len() != 0 {
-              line = &line[..comment[0].0];
-            }
-
-            // 両端の空白や改行を削除
-            line = line.trim_matches(' ').trim_matches('\n');
-
-            if line.len() == 0 {
-                continue;
-            }
-
-            return Some(line.to_string())
-        }
-    }
-}
-
-#[test]
-fn test_vmlines_next() {
-    let mut lines = Vmlines::new("".as_bytes());
-    assert_eq!(lines.next(), None);
-
-    let mut lines = Vmlines::new(r#"
-    // A
-    VM
-    "#.as_bytes());
-    assert_eq!(lines.next(), Some("VM".to_string()));
-    assert_eq!(lines.next(), None);
-
-    let mut lines = Vmlines::new(r#"
-    VM
-    // A
-    VM2 // VM
-    "#.as_bytes());
-    assert_eq!(lines.next(), Some("VM".to_string()));
-    assert_eq!(lines.next(), Some("VM2".to_string()));
-    assert_eq!(lines.next(), None);
-}
+mod vmlines;
+use vmlines::Vmlines;
 
 
 /// ひとつの.vmファイルに対してパースを行うとともに、入力コードへのアクセスを
