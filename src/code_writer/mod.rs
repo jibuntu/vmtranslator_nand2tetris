@@ -1,24 +1,24 @@
 // APIの仕様については nand2tetris - page 160
 
 #![allow(dead_code)]
+use std::io::Write;
 
 mod converter;
 
 /// VMコマンドをHackのアセンブリコードに変換する
 /// CommandType::{LAVEL, GOTO, IF, FUNCTION, RETURN, CALL}に対応する部分は
 /// まだ実装しなくてよい
-pub struct CodeWriter {
+pub struct CodeWriter<W> {
     filename: String,
-    asm: String,
-//    file: File,
+    asm: W
 }
 
-impl CodeWriter {
-    /// 引数はアセンブリコードの保存先のファイル名
-    pub fn new() -> CodeWriter {
+impl <W: Write> CodeWriter<W> {
+    /// 引数はstd::io::Writeトレイトを実装している構造体
+    pub fn new(stream: W) -> CodeWriter<W> {
         CodeWriter {
             filename: String::new(),
-            asm: String::new()
+            asm: stream,
         }
     }
 
@@ -34,7 +34,7 @@ impl CodeWriter {
             _ => return Err("無効なコマンドです".to_string())
         };
 
-        self.asm += &asm;
+        let _ = self.asm.write(asm.as_bytes());
 
         Ok(())
     }
@@ -56,7 +56,7 @@ impl CodeWriter {
             _ => return Err("無効なコマンドです".to_string()),
         };
 
-        self.asm += &asm;
+        let _ = self.asm.write(asm.as_bytes());
 
         Ok(())
     }
