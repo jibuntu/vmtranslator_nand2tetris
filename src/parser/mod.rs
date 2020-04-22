@@ -115,7 +115,7 @@ impl<R: Read> Parser<R> {
     /// 現コマンドの２番目の引数が返される。現コマンドが`CommandType::PUSH`、
     /// `CommandType::POP`、`CommandType::FUNCTION`、`CommandType::CALL`の
     /// 場合のみ本ルーチンを呼ぶようにする
-    fn arg2(&self) -> Option<isize> {
+    pub fn arg2(&self) -> Option<isize> {
         let command = match &self.command {
             Some(c) => c,
             None => return None
@@ -195,7 +195,7 @@ mod test {
     fn test_parser_arg1() {
         let mut parser = Parser::new(r#"
         push local 2
-        add 1
+        add
         return
         "#.as_bytes());
         parser.advance();
