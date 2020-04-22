@@ -9,6 +9,9 @@ stacktest:
 eq:
 	cargo run ./test/eq/eq/eq.vm ./test/eq/eq/eq.asm
 
+eq_true: 
+	cargo run ./test/eq/true/true.vm ./test/eq/true/true.asm
+
 add:
 	cargo run ./test/add/add.vm ./test/add/add.asm
 
