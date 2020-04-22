@@ -32,6 +32,7 @@ impl <W: Write> CodeWriter<W> {
         let asm = match command {
             "add" => converter::add(),
             "sub" => converter::sub(),
+            "neg" => converter::neg(),
             _ => return Err(format!("{} は無効なコマンドです", command))
         };
 

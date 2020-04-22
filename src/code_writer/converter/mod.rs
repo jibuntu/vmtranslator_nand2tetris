@@ -78,6 +78,17 @@ pub fn sub() -> String {
     ).to_string()
 }
 
+/// negコマンド
+pub fn neg() -> String {
+    concat!(
+        "// [start] neg \n",
+        pop2m!("SP"),
+        "M=-M \n",
+        inc!("SP"),
+        "// [end] neg \n"
+    ).to_string()
+}
+
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
 pub fn push_constant(n: isize) -> String {
