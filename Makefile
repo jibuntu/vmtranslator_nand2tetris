@@ -11,3 +11,6 @@ eq:
 
 add:
 	cargo run ./test/add/add.vm ./test/add/add.asm
+
+sub:
+	cargo run ./test/sub/sub.vm ./test/sub/sub.asm
