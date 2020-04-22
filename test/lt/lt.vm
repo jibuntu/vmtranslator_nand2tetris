@@ -1,0 +1,11 @@
+push constant 8
+push constant 8
+lt // false
+
+push constant 6
+push constant 20
+lt // true
+
+push constant 4
+push constant 2
+lt // false
