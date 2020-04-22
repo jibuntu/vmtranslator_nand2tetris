@@ -31,6 +31,7 @@ impl <W: Write> CodeWriter<W> {
     pub fn write_arithmetic(&mut self, command: &str) -> Result<(), String> {
         let asm = match command {
             "add" => converter::add(),
+            "sub" => converter::sub(),
             _ => return Err(format!("{} は無効なコマンドです", command))
         };
 

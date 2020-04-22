@@ -57,6 +57,19 @@ pub fn add() -> String {
     ).to_string()
 }
 
+/// subコマンド
+pub fn sub() -> String {
+    concat!(
+        "// [start] sub \n",
+        pop2d!("SP"), // SPレジスタの値をDレジスタに入れる
+        pop2m!("SP"), // SPレジスタの値をDレジスタに入れる
+        "M=D-M \n", // M[SP] = M[SP+1] - M[SP]
+        inc!("SP"), // SPレジスタの値をインクリメントする
+        "// [end] sub \n"
+    ).to_string()
+}
+
+
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
 pub fn push_constant(n: isize) -> String {
     /*
