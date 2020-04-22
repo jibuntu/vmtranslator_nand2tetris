@@ -13,9 +13,6 @@ use vmlines::Vmlines;
 /// その要素に対してアクセスする便利なメソッドを提供する。さらに、空白文字と
 /// コメントを取り除く
 pub struct Parser<R> {
-    // vm_lines: Vec<String>, // 不要なデータを削除した行のvector
-    // command: String, // 現在のコマンド
-    // count: usize, // 現在の行数
     vm_lines: Vmlines<R>,
     command: Option<String>, // 現在のコマンド
     next: Option<String>, // 次のコマンド
