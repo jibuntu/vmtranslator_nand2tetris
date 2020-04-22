@@ -10,6 +10,7 @@ mod converter;
 /// まだ実装しなくてよい
 pub struct CodeWriter<W> {
     filename: String,
+    rows: usize,
     asm: W
 }
 
@@ -18,6 +19,7 @@ impl <W: Write> CodeWriter<W> {
     pub fn new(stream: W) -> CodeWriter<W> {
         CodeWriter {
             filename: String::new(),
+            rows: 0,
             asm: stream,
         }
     }
@@ -29,13 +31,14 @@ impl <W: Write> CodeWriter<W> {
 
     /// 与えられた算術コマンドをアセンブリコードに変換し、それを書き込む
     pub fn write_arithmetic(&mut self, command: &str) -> Result<(), String> {
-        let asm = match command {
+        let (asm, rows) = match command {
             "add" => converter::add(),
             "sub" => converter::sub(),
             "neg" => converter::neg(),
             _ => return Err(format!("{} は無効なコマンドです", command))
         };
 
+        self.rows += rows;
         let _ = self.asm.write(asm.as_bytes());
 
         Ok(())
@@ -45,7 +48,7 @@ impl <W: Write> CodeWriter<W> {
     /// 変換し、それを書き込む
     pub fn write_push_pop(&mut self, command: &str, segment: &str, 
                           index: isize) -> Result<(), String> {
-        let asm = match command {
+        let (asm, rows) = match command {
             "push" => {
                 match segment {
                     "constant" => {
@@ -59,6 +62,7 @@ impl <W: Write> CodeWriter<W> {
             _ => return Err(format!("{} は無効なコマンドです", command)),
         };
 
+        self.rows += rows;
         let _ = self.asm.write(asm.as_bytes());
 
         Ok(())

@@ -66,41 +66,41 @@ macro_rules! binfunc {
 
 /// addコマンド
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
-pub fn add() -> String {
-    concat!(
+pub fn add() -> (String, usize) {
+    (concat!(
         "// [start] add\n",
         binfunc!("SP", "+"),
         "// [end] add \n"
-    ).to_string()
+    ).to_string(), binfunc!())
 }
 
 /// subコマンド
-pub fn sub() -> String {
-    concat!(
+pub fn sub() -> (String, usize) {
+    (concat!(
         "// [start] sub \n",
         binfunc!("SP", "-"),
         "// [end] sub \n"
-    ).to_string()
+    ).to_string(), binfunc!())
 }
 
 /// negコマンド
-pub fn neg() -> String {
-    concat!(
+pub fn neg() -> (String, usize) {
+    (concat!(
         "// [start] neg \n",
         pop2m!("SP"),
         "M=-M \n",
         inc!("SP"),
         "// [end] neg \n"
-    ).to_string()
+    ).to_string(), pop2m!() + 1 + inc!())
 }
 
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
-pub fn push_constant(n: isize) -> String {
+pub fn push_constant(n: isize) -> (String, usize) {
     /*
     spレジスタの番地ではなく、spレジスタの値の番地にnを代入する
     */
-    format!(
+    (format!(
         concat!(
             "// [start] push constant {n} \n",
             "@{n} \n", // Aレジスタにnを入れる
@@ -110,7 +110,7 @@ pub fn push_constant(n: isize) -> String {
             "M=D \n", // SPレジスタの値の番地にnを入れる
             inc!("SP"), // SPレジスタの値をインクリメントする
             "// [end] push constant {n} \n",
-        ), n=n)
+        ), n=n), 5 + inc!())
 }
 
 #[cfg(test)]
@@ -133,7 +133,7 @@ mod test {
             "M=M+1 \n", // SPレジスタの値をインクリメントする
             "// [end] add \n"
         ).to_string();
-        assert_eq!(add(), asm);
+        assert_eq!(add(), (asm, 10));
     }
     
     #[test]
@@ -150,6 +150,6 @@ mod test {
             "M=M+1 \n", // SPレジスタの値をインクリメントする
             "// [end] push constant {n} \n",
         ), n=n).to_string();
-        assert_eq!(push_constant(n), asm)
+        assert_eq!(push_constant(n), (asm, 7))
     }
 }
