@@ -14,7 +14,7 @@ impl<R: Read> Vmlines<R> {
         }
     }
 
-    /// 不要な行やコメントを除外して上で次の行を返す
+    /// 不要な行やコメントを除外した上で次の行を返す
     pub fn next(&mut self) -> Option<String> {
         let mut vmline = String::new();
 

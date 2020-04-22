@@ -90,7 +90,7 @@ macro_rules! isdz {
     () => { dec!() + 10 + inc!() };
 }
 
-/// addコマンド
+/// addコマンド。
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
 pub fn add() -> (String, usize) {
     (concat!(
@@ -120,7 +120,7 @@ pub fn neg() -> (String, usize) {
     ).to_string(), pop2m!() + 1 + inc!())
 }
 
-/// eqコマンドを変換する関数。引数は現在のアセンブリコードの行数
+/// eqコマンドを変換する関数。引数は現在のアセンブリコードの行数。
 /// trueなら0、falseなら-1がスタックに入る
 pub fn eq(rows: usize) -> (String, usize) {
     /*

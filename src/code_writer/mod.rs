@@ -5,8 +5,8 @@ use std::io::Write;
 
 mod converter;
 
-/// VMコマンドをHackのアセンブリコードに変換する
-/// CommandType::{LAVEL, GOTO, IF, FUNCTION, RETURN, CALL}に対応する部分は
+/// VMコマンドをHackのアセンブリコードに変換する。
+/// `CommandType::{LAVEL, GOTO, IF, FUNCTION, RETURN, CALL}`に対応する部分は
 /// まだ実装しなくてよい
 pub struct CodeWriter<W> {
     filename: String,
