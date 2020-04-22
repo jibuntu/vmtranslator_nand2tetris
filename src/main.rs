@@ -38,6 +38,8 @@ fn vm_to_asm<R, W>(p: &mut Parser<R>, cw: &mut CodeWriter<W>)
                                             p.arg1().unwrap()))
                 }
             }
+            CommandType::None => return Err(format!("{} は無効なコマンドです",
+                                                    p.arg1().unwrap())),
             _ => return Err(format!("{:?} は未実装のコマンドです", 
                                     p.command_type()))
         }
