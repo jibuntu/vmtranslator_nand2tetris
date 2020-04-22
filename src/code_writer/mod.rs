@@ -68,3 +68,20 @@ impl <W: Write> CodeWriter<W> {
         Ok(())
     }
 }
+
+
+#[cfg(test)]
+mod test {
+    use super::CodeWriter;
+    use std::io::Cursor;
+
+    #[test]
+    fn test_code_writer() {
+        let asm = Cursor::new(Vec::new());
+        let mut cw = CodeWriter::new(asm);
+        cw.write_push_pop("push", "constant", 1).unwrap();
+        cw.write_push_pop("push", "constant", 2).unwrap();
+        cw.write_arithmetic("add").unwrap();
+        assert_eq!(cw.rows, 24);
+    }
+}
