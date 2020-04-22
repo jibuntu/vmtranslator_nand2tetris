@@ -44,15 +44,27 @@ macro_rules! pop2m {
     };
 }
 
+/// ２変数関数（binary functoin）の計算を行うマクロ。
+/// 計算結果はMレジスタに保存される
+/// * 第一引数はスタックポインタ名
+/// * 第二引数は次のうちのどれか。`+, -, &, |`
+macro_rules! binfunc {
+    ($var:expr, $sign:expr) => {
+        concat!(
+            pop2d!($var), // SPレジスタの値をDレジスタに入れる
+            pop2m!($var), // SPレジスタの値をMレジスタに入れる
+            "M=D", $sign, "M", " \n", // M[SP] = M[SP+1] $sign M[SP]
+            inc!($var) // SPレジスタの値をインクリメントする
+        )
+    };
+}
+
 /// addコマンド
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
 pub fn add() -> String {
     concat!(
         "// [start] add\n",
-        pop2d!("SP"), // SPレジスタの値をDレジスタに入れる
-        pop2m!("SP"), // SPレジスタの値をMレジスタに入れる
-        "M=D+M \n", // M[SP] = M[SP+1] + M[SP]
-        inc!("SP"), // SPレジスタの値をインクリメントする
+        binfunc!("SP", "+"),
         "// [end] add \n"
     ).to_string()
 }
@@ -61,10 +73,7 @@ pub fn add() -> String {
 pub fn sub() -> String {
     concat!(
         "// [start] sub \n",
-        pop2d!("SP"), // SPレジスタの値をDレジスタに入れる
-        pop2m!("SP"), // SPレジスタの値をDレジスタに入れる
-        "M=D-M \n", // M[SP] = M[SP+1] - M[SP]
-        inc!("SP"), // SPレジスタの値をインクリメントする
+        binfunc!("SP", "-"),
         "// [end] sub \n"
     ).to_string()
 }
