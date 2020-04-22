@@ -2,21 +2,36 @@
 
 #![allow(dead_code)]
 
+macro_rules! inc {
+    ($ver:expr) => {
+        concat!(
+            "@", $ver, " \n",
+            "M=M+1 \n"
+        )
+    };
+}
+
+macro_rules! dec {
+    ($ver:expr) => {
+        concat!(
+            "@", $ver, " \n",
+            "M=M-1 \n"
+        )
+    };
+}
+
 /// addコマンド
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
 pub fn add() -> String {
     concat!(
         "// [start] add\n",
-        "@SP \n",
-        "M=M-1 \n", // SPレジスタの値をデクリメント
+        dec!("SP"), // SPレジスタの値をデクリメント
         "A=M \n", 
         "D=M \n", // Dレジスタに数値を入れる
-        "@SP \n",
-        "M=M-1 \n", // 再びSPレジスタの値をデクリメント
+        dec!("SP"), // 再びSPレジスタの値をデクリメント
         "A=M \n",
         "M=D+M \n", // M[SP] = M[SP+1] + M[SP]
-        "@SP \n",
-        "M=M+1 \n", // SPレジスタの値をインクリメントする
+        inc!("SP"), // SPレジスタの値をインクリメントする
         "// [end] add \n"
     ).to_string()
 }
@@ -34,8 +49,48 @@ pub fn push_constant(n: isize) -> String {
             "@SP \n",
             "A=M \n", // SPレジスタの値をAレジスタに入れる
             "M=D \n", // SPレジスタの値の番地にnを入れる
+            inc!("SP"), // SPレジスタの値をインクリメントする
+            "// [end] push constant {n} \n",
+        ), n=n)
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        let asm = concat!(
+            "// [start] add\n",
+            "@SP \n",
+            "M=M-1 \n", // SPレジスタの値をデクリメント
+            "A=M \n", 
+            "D=M \n", // Dレジスタに数値を入れる
+            "@SP \n",
+            "M=M-1 \n", // 再びSPレジスタの値をデクリメント
+            "A=M \n",
+            "M=D+M \n", // M[SP] = M[SP+1] + M[SP]
+            "@SP \n",
+            "M=M+1 \n", // SPレジスタの値をインクリメントする
+            "// [end] add \n"
+        ).to_string();
+        assert_eq!(add(), asm);
+    }
+    
+    #[test]
+    fn test_push_constant() {
+        let n = 5;
+        let asm = format!(concat!(
+            "// [start] push constant {n} \n",
+            "@{n} \n", // Aレジスタにnを入れる
+            "D=A \n", // Dレジスタに移す
+            "@SP \n",
+            "A=M \n", // SPレジスタの値をAレジスタに入れる
+            "M=D \n", // SPレジスタの値の番地にnを入れる
             "@SP \n",
             "M=M+1 \n", // SPレジスタの値をインクリメントする
             "// [end] push constant {n} \n",
-        ), n=n)
+        ), n=n).to_string();
+        assert_eq!(push_constant(n), asm)
+    }
 }
