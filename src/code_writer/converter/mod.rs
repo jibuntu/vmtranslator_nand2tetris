@@ -57,7 +57,7 @@ macro_rules! binfunc {
         concat!(
             pop2d!($var), // SPレジスタの値をDレジスタに入れる
             pop2m!($var), // SPレジスタの値をMレジスタに入れる
-            "M=D", $sign, "M", " \n", // M[SP] = M[SP+1] $sign M[SP]
+            "M=M", $sign, "D", " \n", // M[SP] = M[SP] $sign M[SP+1]
             inc!($var) // SPレジスタの値をインクリメントする
         )
     };
@@ -155,7 +155,7 @@ mod test {
             "@SP \n",
             "M=M-1 \n", // 再びSPレジスタの値をデクリメント
             "A=M \n",
-            "M=D+M \n", // M[SP] = M[SP+1] + M[SP]
+            "M=M+D \n", // M[SP] = M[SP] + M[SP+1]
             "@SP \n",
             "M=M+1 \n", // SPレジスタの値をインクリメントする
         ).to_string();
