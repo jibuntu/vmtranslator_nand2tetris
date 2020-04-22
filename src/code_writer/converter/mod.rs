@@ -89,6 +89,30 @@ macro_rules! isdz {
     () => { 10 + inc!() };
 }
 
+/// Dレジスタの値に対して条件がtrueなら-1、falseなら0がスタックに入る。
+/// 内部でformatマクロを使っているため、concatマクロの中では使えない。
+/// * 第一引数はスタックポインタ名
+/// * 第二引数は条件
+/// * 第三引数のrowsは行数
+macro_rules! ifd {
+    ($var:expr, $jump:expr, $rows:expr) => {
+        format!(concat!(
+/* 01 */    "@{adress_true} \n", // Dが0のときのジャンプ先を指定
+/* 02 */    "D;", $jump, " \n", // Dが0ならadress_trueにジャンプする
+/* 03 */    "@0 \n", // Dが0でない場合
+/* 04 */    "D=A \n", // Dに0を入れる
+/* 05 */    "@{adress_end} \n", // trueのときに飛ぶコードが終わった所を指定
+/* 06 */    "0;JMP \n", // adress_endへジャンプする
+/* 07 */    "D=-1 \n", // Dに-1を入れる // D==0ならここに飛ぶ
+/* 08 */    "@", $var, " \n", // address_endで飛んでくる場所
+/* 09 */    "A=M \n",
+/* 10 */    "M=D \n", // $var変数にDの値を入れる
+            inc!($var) // インクリメントする
+        ), adress_true=($rows + 6), adress_end=($rows + 7))
+    };
+    () => { 10 + inc!() };
+}
+
 /// addコマンド。
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
 pub fn add() -> (String, usize) {
