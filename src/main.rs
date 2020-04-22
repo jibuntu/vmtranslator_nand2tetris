@@ -32,11 +32,7 @@ fn vm_to_asm<R, W>(p: &mut Parser<R>, cw: &mut CodeWriter<W>)
                                   p.arg2().unwrap())?;
             },
             CommandType::ARITHMETIC => {
-                match p.arg1().unwrap().as_str() {
-                    "add" => cw.write_arithmetic("add")?,
-                    _ => return Err(format!("{:?} は未実装のコマンドです", 
-                                            p.arg1().unwrap()))
-                }
+                cw.write_arithmetic(p.arg1().unwrap().as_str())?;
             }
             CommandType::None => return Err(format!("{} は無効なコマンドです",
                                                     p.arg1().unwrap())),
