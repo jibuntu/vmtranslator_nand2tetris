@@ -50,7 +50,7 @@ pub fn add() -> String {
     concat!(
         "// [start] add\n",
         pop2d!("SP"), // SPレジスタの値をDレジスタに入れる
-        pop2m!("SP"), // SPレジスタの値をDレジスタに入れる
+        pop2m!("SP"), // SPレジスタの値をMレジスタに入れる
         "M=D+M \n", // M[SP] = M[SP+1] + M[SP]
         inc!("SP"), // SPレジスタの値をインクリメントする
         "// [end] add \n"
