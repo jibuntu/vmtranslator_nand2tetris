@@ -6,6 +6,9 @@ simpleadd:
 stacktest:
 	cargo run ../StackArithmetic/StackTest/StackTest.vm ../StackArithmetic/StackTest/StackTest.asm
 
+gt:
+	cargo run ./test/gt/gt.vm ./test/gt/gt.asm
+
 eq:
 	cargo run ./test/eq/eq/eq.vm ./test/eq/eq/eq.asm
 
