@@ -1,7 +1,9 @@
 //! 特定のVMコマンドに対応するアセンブリコードを返す関数群
 
 #![allow(dead_code)]
+#![allow(unused_macros)]
 
+/// 特定の変数の値をincrementするためのアセンブリコードを出力するマクロ
 macro_rules! inc {
     ($ver:expr) => {
         concat!(
@@ -11,6 +13,7 @@ macro_rules! inc {
     };
 }
 
+/// 特定の変数の値をdecrementするためのアセンブリコードを出力するマクロ
 macro_rules! dec {
     ($ver:expr) => {
         concat!(
@@ -20,16 +23,34 @@ macro_rules! dec {
     };
 }
 
+/// 特定の変数の値をDレジスタにpopするマクロ
+macro_rules! pop2d {
+    ($var:expr) => {
+        concat!(
+            dec!($var), // $varレジスタの値をデクリメント
+            "A=M \n",
+            "D=M \n" // Dレジスタに数値を入れる
+        )
+    };
+}
+
+/// 特定の変数の値をMレジスタにpopするマクロ
+macro_rules! pop2m {
+    ($var:expr) => {
+        concat!(
+            dec!($var), // $varレジスタの値をデクリメント
+            "A=M \n", 
+        )
+    };
+}
+
 /// addコマンド
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
 pub fn add() -> String {
     concat!(
         "// [start] add\n",
-        dec!("SP"), // SPレジスタの値をデクリメント
-        "A=M \n", 
-        "D=M \n", // Dレジスタに数値を入れる
-        dec!("SP"), // 再びSPレジスタの値をデクリメント
-        "A=M \n",
+        pop2d!("SP"), // SPレジスタの値をDレジスタに入れる
+        pop2m!("SP"), // SPレジスタの値をDレジスタに入れる
         "M=D+M \n", // M[SP] = M[SP+1] + M[SP]
         inc!("SP"), // SPレジスタの値をインクリメントする
         "// [end] add \n"
