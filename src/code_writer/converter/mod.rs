@@ -68,7 +68,8 @@ macro_rules! binfunc {
 /// Dレジスタの値が0なら-1がスタックに入る。
 /// Dレジスタの値が0以外なら0がスタックに入る。
 /// 内部でformatマクロを使っているため、concatマクロの中では使えない。
-/// * rowsは行数
+/// * 第一引数はスタックポインタ名
+/// * 第二引数のrowsは行数
 macro_rules! isdz {
     ($var:expr, $rows:expr) => {
         format!(concat!(
