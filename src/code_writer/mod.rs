@@ -31,7 +31,7 @@ impl <W: Write> CodeWriter<W> {
     pub fn write_arithmetic(&mut self, command: &str) -> Result<(), String> {
         let asm = match command {
             "add" => converter::add(),
-            _ => return Err("無効なコマンドです".to_string())
+            _ => return Err(format!("{} は無効なコマンドです", command))
         };
 
         let _ = self.asm.write(asm.as_bytes());
@@ -49,11 +49,12 @@ impl <W: Write> CodeWriter<W> {
                     "constant" => {
                         converter::push_constant(index)
                     },
-                    _ => return Err("無効なセグメントです".to_string())
+                    _ => return Err(format!("{} は無効なセグメントです", 
+                                            segment))
                 }
             },
-            "pop" => return Err("未対応".to_string()),
-            _ => return Err("無効なコマンドです".to_string()),
+            "pop" => return Err("POPコマンドは未対応".to_string()),
+            _ => return Err(format!("{} は無効なコマンドです", command)),
         };
 
         let _ = self.asm.write(asm.as_bytes());
