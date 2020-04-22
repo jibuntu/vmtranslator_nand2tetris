@@ -12,6 +12,9 @@ eq:
 eq_true: 
 	cargo run ./test/eq/true/true.vm ./test/eq/true/true.asm
 
+eq_false: 
+	cargo run ./test/eq/false/false.vm ./test/eq/false/false.asm
+
 add:
 	cargo run ./test/add/add.vm ./test/add/add.asm
 
