@@ -36,6 +36,7 @@ impl <W: Write> CodeWriter<W> {
             "sub" => converter::sub(),
             "neg" => converter::neg(),
             "eq" => converter::eq(self.rows),
+            "gt" => converter::gt(self.rows),
             _ => return Err(format!("{} は無効なコマンドです", command))
         };
 

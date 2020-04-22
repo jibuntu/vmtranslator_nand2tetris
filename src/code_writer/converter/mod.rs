@@ -147,6 +147,19 @@ pub fn eq(rows: usize) -> (String, usize) {
     (asm, binfunc!() + pop2d!() + isdz!())
 }
 
+/// gtコマンドを変換する関数。引数は現在のアセンブリコードの行数。
+/// trueなら0、falseなら-1がスタックに入る
+pub fn gt(rows: usize) -> (String, usize) {
+    let mut asm = String::new();
+    /*
+    引き算をした結果が0より大きければtrue
+    */
+    asm += binfunc!("SP", "-"); // 引き算をする
+    asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
+    asm += &ifd!("SP", "JGT", rows + binfunc!() + pop2d!());
+
+    (asm, binfunc!() + pop2d!() + ifd!())
+}
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
 pub fn push_constant(n: isize) -> (String, usize) {
