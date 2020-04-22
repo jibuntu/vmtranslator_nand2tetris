@@ -5,3 +5,6 @@ simpleadd:
 
 stacktest:
 	cargo run ../StackArithmetic/StackTest/StackTest.vm ../StackArithmetic/StackTest/StackTest.asm
+
+eq:
+	cargo run ./test/eq/eq.vm ./test/eq/eq.asm

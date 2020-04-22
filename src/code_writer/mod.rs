@@ -35,6 +35,7 @@ impl <W: Write> CodeWriter<W> {
             "add" => converter::add(),
             "sub" => converter::sub(),
             "neg" => converter::neg(),
+            "eq" => converter::eq(self.rows),
             _ => return Err(format!("{} は無効なコマンドです", command))
         };
 
@@ -72,6 +73,8 @@ impl <W: Write> CodeWriter<W> {
 
 #[cfg(test)]
 mod test {
+    use std::io::Read;
+
     use super::CodeWriter;
     use std::io::Cursor;
 
@@ -83,5 +86,44 @@ mod test {
         cw.write_push_pop("push", "constant", 2).unwrap();
         cw.write_arithmetic("add").unwrap();
         assert_eq!(cw.rows, 24);
+    }
+
+    #[test]
+    fn test_code_writer_write_arithmetic() {
+        let cursor = Cursor::new(Vec::new());
+        let mut cw = CodeWriter::new(cursor);
+        cw.write_push_pop("push", "constant", 1).unwrap();
+        cw.write_push_pop("push", "constant", 2).unwrap();
+
+        let mut asm = format!(concat!(
+            "// [start] push constant {n} \n",
+            "@{n} \n",
+            "D=A \n",
+            "@SP \n",
+            "A=M \n",
+            "M=D \n",
+            "@SP \n",
+            "M=M+1 \n", 
+            "// [end] push constant {n} \n"
+        ), n=1);
+
+        asm += &format!(concat!(
+            "// [start] push constant {n} \n",
+            "@{n} \n",
+            "D=A \n",
+            "@SP \n",
+            "A=M \n",
+            "M=D \n",
+            "@SP \n",
+            "M=M+1 \n", 
+            "// [end] push constant {n} \n"
+        ), n=2);
+
+        assert_eq!(cw.rows, 14);
+        assert_eq!(cw.asm.get_ref(), &asm.into_bytes());
+        println!("{}", String::from_utf8(cw.asm.get_ref().to_vec()).unwrap());
+
+        cw.write_arithmetic("eq").unwrap();
+        println!("{}", String::from_utf8(cw.asm.get_ref().to_vec()).unwrap());
     }
 }

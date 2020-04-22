@@ -64,6 +64,31 @@ macro_rules! binfunc {
     () => { pop2d!() + pop2m!() + 1 + inc!() };
 }
 
+/// Dレジスタの値が0かどうか判定するマクロ（is d zero?）。
+/// Dレジスタの値が0なら-1がスタックに入る。
+/// Dレジスタの値が0以外なら0がスタックに入る。
+/// 内部でformatマクロを使っているため、concatマクロの中では使えない。
+/// * rowsは行数
+macro_rules! isdz {
+    ($var:expr, $rows:expr) => {
+        format!(concat!(
+            dec!($var), // デクリメントする
+/* 01 */    "@{adress_true} \n", // Dが0のときのジャンプ先を指定
+/* 02 */    "D;JEQ \n", // Dが0ならadressにジャンプする
+/* 03 */    "@0 \n", // Dが0でない場合
+/* 04 */    "D=A \n", // Dに0を入れる
+/* 05 */    "@{adress_end} \n", // trueのときに飛ぶコードが終わった所を指定
+/* 06 */    "0;JMP \n", // adress_endへジャンプする
+/* 07 */    "D=-1 \n", // Dに-1を入れる // D==0ならここに飛ぶ
+/* 08 */    "@", $var, " \n", // address_endで飛んでくる場所
+/* 09 */    "A=M \n",
+/* 10 */    "M=D \n", // $var変数にDの値を入れる
+            inc!($var) // インクリメントする
+        ), adress_true=($rows + dec!() + 7), adress_end=($rows + dec!() + 7))
+    };
+    () => { dec!() + 10 + inc!() };
+}
+
 /// addコマンド
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
 pub fn add() -> (String, usize) {
@@ -92,6 +117,22 @@ pub fn neg() -> (String, usize) {
         inc!("SP"),
         "// [end] neg \n"
     ).to_string(), pop2m!() + 1 + inc!())
+}
+
+/// eqコマンドを変換する関数。引数は現在のアセンブリコードの行数
+/// trueなら0、falseなら-1がスタックに入る
+pub fn eq(rows: usize) -> (String, usize) {
+    /*
+    引き算をするをした結果のMが0かどうか
+    */
+    let mut asm = String::new();
+    asm += "// [start] eq \n";
+    asm += binfunc!("SP", "-"); // 引き算をする
+    asm += "D=M \n"; // 引き算の結果をDレジスタに入れる
+    asm += &isdz!("SP", rows + binfunc!()); // 現在の行数を渡す
+    asm += "// [end] eq \n";
+
+    (asm, binfunc!() + 1 + isdz!())
 }
 
 
