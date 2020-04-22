@@ -11,6 +11,7 @@ macro_rules! inc {
             "M=M+1 \n"
         )
     };
+    () => { 2 };
 }
 
 /// 特定の変数の値をdecrementするためのアセンブリコードを出力するマクロ
@@ -21,6 +22,7 @@ macro_rules! dec {
             "M=M-1 \n"
         )
     };
+    () => { 2 };
 }
 
 /// 特定の変数の値をDレジスタにpopするマクロ
@@ -32,6 +34,7 @@ macro_rules! pop2d {
             "D=M \n" // Dレジスタに数値を入れる
         )
     };
+    () => { dec!() + 2 };
 }
 
 /// 特定の変数の値をMレジスタにpopするマクロ
@@ -42,6 +45,7 @@ macro_rules! pop2m {
             "A=M \n", 
         )
     };
+    () => { dec!() + 1 };
 }
 
 /// ２変数関数（binary functoin）の計算を行うマクロ。
@@ -57,6 +61,7 @@ macro_rules! binfunc {
             inc!($var) // SPレジスタの値をインクリメントする
         )
     };
+    () => { pop2d!() + pop2m!() + 1 + inc!() };
 }
 
 /// addコマンド
