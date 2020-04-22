@@ -92,44 +92,22 @@ macro_rules! isdz {
 
 /// addコマンド。
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
-pub fn add(rows: usize) -> (String, usize) {
-    let asm_rows = binfunc!();
-    let start_rows = rows;
-    let end_rows = start_rows + asm_rows - 1;
-
-    (format!(concat!(
-        "// [start: {}] add\n",
-        binfunc!("SP", "+"),
-        "// [end: {}] add \n"
-    ), start_rows, end_rows), asm_rows)
+pub fn add() -> (String, usize) {
+    (binfunc!("SP", "+").to_string(), binfunc!())
 }
 
 /// subコマンド
-pub fn sub(rows: usize) -> (String, usize) {
-    let asm_rows = binfunc!();
-    let start_rows = rows;
-    let end_rows = start_rows + asm_rows - 1;
-
-    (format!(concat!(
-        "// [start: {}] sub \n",
-        binfunc!("SP", "-"),
-        "// [end: {}] sub \n"
-    ), start_rows, end_rows), asm_rows)
+pub fn sub() -> (String, usize) {
+    (binfunc!("SP", "-").to_string(), binfunc!())
 }
 
 /// negコマンド
-pub fn neg(rows: usize) -> (String, usize) {
-    let asm_rows = pop2m!() + 1 + inc!();
-    let start_rows = rows;
-    let end_rows = start_rows + asm_rows - 1;
-
-    (format!(concat!(
-        "// [start: {}] neg \n",
+pub fn neg() -> (String, usize) {
+    (concat!(
         pop2m!("SP"),
         "M=-M \n",
         inc!("SP"),
-        "// [end: {}] neg \n"
-    ), start_rows, end_rows), asm_rows)
+    ).to_string(), pop2m!() + 1 + inc!())
 }
 
 /// eqコマンドを変換する関数。引数は現在のアセンブリコードの行数。
@@ -138,41 +116,29 @@ pub fn eq(rows: usize) -> (String, usize) {
     /*
     引き算をするをした結果のMが0かどうか
     */
-    let asm_rows = binfunc!() + 1 + isdz!();
-    let start_rows = rows;
-    let end_rows = start_rows + asm_rows - 1;
-
     let mut asm = String::new();
-    asm += &format!("// [start: {}] eq \n", start_rows);
     asm += binfunc!("SP", "-"); // 引き算をする
     asm += "D=M \n"; // 引き算の結果をDレジスタに入れる
     asm += &isdz!("SP", rows + binfunc!()); // 現在の行数を渡す
-    asm += &format!("// [end: {}] eq \n", end_rows);
-
-    (asm, asm_rows)
+    
+    (asm, binfunc!() + 1 + isdz!())
 }
 
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
-pub fn push_constant(n: isize, rows: usize) -> (String, usize) {
+pub fn push_constant(n: isize) -> (String, usize) {
     /*
     spレジスタの番地ではなく、spレジスタの値の番地にnを代入する
     */
-    let asm_rows = 5 + inc!();
-    let start_rows = rows;
-    let end_rows = start_rows + asm_rows - 1;
-
     (format!(
         concat!(
-            "// [start: {start_rows}] push constant {n} \n",
             "@{n} \n", // Aレジスタにnを入れる
             "D=A \n", // Dレジスタに移す
             "@SP \n",
             "A=M \n", // SPレジスタの値をAレジスタに入れる
             "M=D \n", // SPレジスタの値の番地にnを入れる
             inc!("SP"), // SPレジスタの値をインクリメントする
-            "// [end: {end_rows}] push constant {n} \n",
-        ), n=n, start_rows=start_rows, end_rows=end_rows), asm_rows)
+        ), n=n), 5 + inc!())
 }
 
 #[cfg(test)]
@@ -182,7 +148,6 @@ mod test {
     #[test]
     fn test_add() {
         let asm = concat!(
-            "// [start: 0] add\n",
             "@SP \n",
             "M=M-1 \n", // SPレジスタの値をデクリメント
             "A=M \n", 
@@ -193,16 +158,14 @@ mod test {
             "M=D+M \n", // M[SP] = M[SP+1] + M[SP]
             "@SP \n",
             "M=M+1 \n", // SPレジスタの値をインクリメントする
-            "// [end: 9] add \n"
         ).to_string();
-        assert_eq!(add(0), (asm, 10));
+        assert_eq!(add(), (asm, 10));
     }
     
     #[test]
     fn test_push_constant() {
         let n = 5;
         let asm = format!(concat!(
-            "// [start: 0] push constant {n} \n",
             "@{n} \n", // Aレジスタにnを入れる
             "D=A \n", // Dレジスタに移す
             "@SP \n",
@@ -210,8 +173,7 @@ mod test {
             "M=D \n", // SPレジスタの値の番地にnを入れる
             "@SP \n",
             "M=M+1 \n", // SPレジスタの値をインクリメントする
-            "// [end: 6] push constant {n} \n",
         ), n=n).to_string();
-        assert_eq!(push_constant(n, 0), (asm, 7))
+        assert_eq!(push_constant(n), (asm, 7))
     }
 }

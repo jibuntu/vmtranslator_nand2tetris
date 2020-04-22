@@ -32,15 +32,20 @@ impl <W: Write> CodeWriter<W> {
     /// 与えられた算術コマンドをアセンブリコードに変換し、それを書き込む
     pub fn write_arithmetic(&mut self, command: &str) -> Result<(), String> {
         let (asm, rows) = match command {
-            "add" => converter::add(self.rows),
-            "sub" => converter::sub(self.rows),
-            "neg" => converter::neg(self.rows),
+            "add" => converter::add(),
+            "sub" => converter::sub(),
+            "neg" => converter::neg(),
             "eq" => converter::eq(self.rows),
             _ => return Err(format!("{} は無効なコマンドです", command))
         };
 
+        let asm_code = format!(concat!(
+            "// [start: {}] {c} \n",
+            "{}",
+            "// [end: {}] {c} \n"
+        ), self.rows, asm, self.rows+rows-1, c=command);
+        let _ = self.asm.write(asm_code.as_bytes());
         self.rows += rows;
-        let _ = self.asm.write(asm.as_bytes());
 
         Ok(())
     }
@@ -53,7 +58,7 @@ impl <W: Write> CodeWriter<W> {
             "push" => {
                 match segment {
                     "constant" => {
-                        converter::push_constant(index, self.rows)
+                        converter::push_constant(index)
                     },
                     _ => return Err(format!("{} は無効なセグメントです", 
                                             segment))
@@ -63,9 +68,13 @@ impl <W: Write> CodeWriter<W> {
             _ => return Err(format!("{} は無効なコマンドです", command)),
         };
 
+        let asm_code = format!(concat!(
+            "// [start: {}] {c} {s} {i} \n",
+            "{}",
+            "// [end: {}] {c} {s} {i} \n"
+        ), self.rows, asm, self.rows+rows-1, c=command, s=segment, i=index);
+        let _ = self.asm.write(asm_code.as_bytes());
         self.rows += rows;
-        let _ = self.asm.write(asm.as_bytes());
-
         Ok(())
     }
 }
