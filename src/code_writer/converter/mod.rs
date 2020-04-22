@@ -113,7 +113,7 @@ pub fn neg() -> (String, usize) {
 /// trueなら0、falseなら-1がスタックに入る
 pub fn eq(rows: usize) -> (String, usize) {
     /*
-    引き算をするをした結果のMが0かどうか
+    引き算をした結果のMが0かどうか
     */
     let mut asm = String::new();
     asm += binfunc!("SP", "-"); // 引き算をする
