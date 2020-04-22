@@ -185,6 +185,15 @@ pub fn or() -> (String, usize) {
     (binfunc!("SP", "|").to_string(), binfunc!())
 }
 
+/// notコマンド
+pub fn not() -> (String, usize) {
+    (concat!(
+        pop2m!("SP"),
+        "M=!M \n",
+        inc!("SP"),
+    ).to_string(), pop2m!() + 1 + inc!())
+}
+
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
 pub fn push_constant(n: isize) -> (String, usize) {

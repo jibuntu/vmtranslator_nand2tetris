@@ -40,6 +40,7 @@ impl <W: Write> CodeWriter<W> {
             "lt" => converter::lt(self.rows),
             "and" => converter::and(),
             "or" => converter::or(),
+            "not" => converter::not(),
             _ => return Err(format!("{} は無効なコマンドです", command))
         };
 
