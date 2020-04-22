@@ -73,9 +73,8 @@ macro_rules! binfunc {
 macro_rules! isdz {
     ($var:expr, $rows:expr) => {
         format!(concat!(
-            dec!($var), // デクリメントする
 /* 01 */    "@{adress_true} \n", // Dが0のときのジャンプ先を指定
-/* 02 */    "D;JEQ \n", // Dが0ならadressにジャンプする
+/* 02 */    "D;JEQ \n", // Dが0ならadress_trueにジャンプする
 /* 03 */    "@0 \n", // Dが0でない場合
 /* 04 */    "D=A \n", // Dに0を入れる
 /* 05 */    "@{adress_end} \n", // trueのときに飛ぶコードが終わった所を指定
@@ -85,9 +84,9 @@ macro_rules! isdz {
 /* 09 */    "A=M \n",
 /* 10 */    "M=D \n", // $var変数にDの値を入れる
             inc!($var) // インクリメントする
-        ), adress_true=($rows + dec!() + 7), adress_end=($rows + dec!() + 7))
+        ), adress_true=($rows + 6), adress_end=($rows + 7))
     };
-    () => { dec!() + 10 + inc!() };
+    () => { 10 + inc!() };
 }
 
 /// addコマンド。
@@ -118,10 +117,10 @@ pub fn eq(rows: usize) -> (String, usize) {
     */
     let mut asm = String::new();
     asm += binfunc!("SP", "-"); // 引き算をする
-    asm += "D=M \n"; // 引き算の結果をDレジスタに入れる
-    asm += &isdz!("SP", rows + binfunc!()); // 現在の行数を渡す
+    asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
+    asm += &isdz!("SP", rows + binfunc!() + pop2d!()); // 現在の行数を渡す
     
-    (asm, binfunc!() + 1 + isdz!())
+    (asm, binfunc!() + pop2d!() + isdz!())
 }
 
 
