@@ -175,6 +175,11 @@ pub fn lt(rows: usize) -> (String, usize) {
     (asm, binfunc!() + pop2d!() + ifd!())
 }
 
+/// andコマンド
+pub fn and() -> (String, usize) {
+    (binfunc!("SP", "&").to_string(), binfunc!())
+}
+
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
 pub fn push_constant(n: isize) -> (String, usize) {

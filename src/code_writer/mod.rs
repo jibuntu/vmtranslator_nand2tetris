@@ -38,6 +38,7 @@ impl <W: Write> CodeWriter<W> {
             "eq" => converter::eq(self.rows),
             "gt" => converter::gt(self.rows),
             "lt" => converter::lt(self.rows),
+            "and" => converter::and(),
             _ => return Err(format!("{} は無効なコマンドです", command))
         };
 
