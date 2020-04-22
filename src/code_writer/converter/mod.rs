@@ -15,6 +15,8 @@ pub fn add() -> String {
         "M=M-1 \n", // 再びSPレジスタの値をデクリメント
         "A=M \n",
         "M=D+M \n", // M[SP] = M[SP+1] + M[SP]
+        "@SP \n",
+        "M=M+1 \n", // SPレジスタの値をインクリメントする
         "// [end] add \n"
     ).to_string()
 }
