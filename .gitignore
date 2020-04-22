@@ -2,3 +2,4 @@
 Cargo.lock
 /output
 *.asm
+*.out
