@@ -32,9 +32,9 @@ impl <W: Write> CodeWriter<W> {
     /// 与えられた算術コマンドをアセンブリコードに変換し、それを書き込む
     pub fn write_arithmetic(&mut self, command: &str) -> Result<(), String> {
         let (asm, rows) = match command {
-            "add" => converter::add(),
-            "sub" => converter::sub(),
-            "neg" => converter::neg(),
+            "add" => converter::add(self.rows),
+            "sub" => converter::sub(self.rows),
+            "neg" => converter::neg(self.rows),
             "eq" => converter::eq(self.rows),
             _ => return Err(format!("{} は無効なコマンドです", command))
         };
@@ -53,7 +53,7 @@ impl <W: Write> CodeWriter<W> {
             "push" => {
                 match segment {
                     "constant" => {
-                        converter::push_constant(index)
+                        converter::push_constant(index, self.rows)
                     },
                     _ => return Err(format!("{} は無効なセグメントです", 
                                             segment))
@@ -96,7 +96,7 @@ mod test {
         cw.write_push_pop("push", "constant", 2).unwrap();
 
         let mut asm = format!(concat!(
-            "// [start] push constant {n} \n",
+            "// [start: 0] push constant {n} \n",
             "@{n} \n",
             "D=A \n",
             "@SP \n",
@@ -104,11 +104,11 @@ mod test {
             "M=D \n",
             "@SP \n",
             "M=M+1 \n", 
-            "// [end] push constant {n} \n"
+            "// [end: 6] push constant {n} \n"
         ), n=1);
 
         asm += &format!(concat!(
-            "// [start] push constant {n} \n",
+            "// [start: 7] push constant {n} \n",
             "@{n} \n",
             "D=A \n",
             "@SP \n",
@@ -116,7 +116,7 @@ mod test {
             "M=D \n",
             "@SP \n",
             "M=M+1 \n", 
-            "// [end] push constant {n} \n"
+            "// [end: 13] push constant {n} \n"
         ), n=2);
 
         assert_eq!(cw.rows, 14);
