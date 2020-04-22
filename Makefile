@@ -8,3 +8,6 @@ stacktest:
 
 eq:
 	cargo run ./test/eq/eq.vm ./test/eq/eq.asm
+
+add:
+	cargo run ./test/add/add.vm ./test/add/add.asm
