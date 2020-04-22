@@ -32,7 +32,7 @@ impl<R: Read> Vmlines<R> {
             }
 
             // 両端の空白や改行を削除
-            line = line.trim_matches(' ').trim_matches('\n');
+            line = line.trim();
 
             if line.len() == 0 {
                 continue;
