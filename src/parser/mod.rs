@@ -105,7 +105,7 @@ impl<R: Read> Parser<R> {
 
         if words.len() == 3 {
             return Some(words[1].to_string());
-        } else if words.len() == 2 {
+        } else if words.len() == 1 {
             return Some(words[0].to_string());
         }
 
@@ -196,12 +196,14 @@ mod test {
         let mut parser = Parser::new(r#"
         push local 2
         add
-        return
+        sub
         "#.as_bytes());
         parser.advance();
         assert_eq!(&parser.arg1().unwrap(), "local");
         parser.advance();
-        assert_eq!(&parser.arg1().unwrap(), "add");
+        assert_eq!(parser.arg1(), Some("add".to_string()));
+        parser.advance();
+        assert_eq!(parser.arg1(), Some("sub".to_string()));
         parser.advance();
         assert_eq!(parser.arg1(), None);
     }
@@ -211,7 +213,7 @@ mod test {
         let mut parser = Parser::new(r#"
         push local 2
         pop local 1
-        add 1
+        add
         return
         "#.as_bytes());
         parser.advance();
