@@ -1,5 +1,8 @@
 # 他のディレクトリにある問題用の*.vmファイルをコンパイルするためのMakefile
 
+fibonacciseres:
+	cargo run ../ProgramFlow/FibonacciSeries/FibonacciSeries.vm ../ProgramFlow/FibonacciSeries/FibonacciSeries.asm
+
 basicloop:
 	cargo run ../ProgramFlow/BasicLoop/BasicLoop.vm ../ProgramFlow/BasicLoop/BasicLoop.asm
 
