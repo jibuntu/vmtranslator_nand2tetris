@@ -71,6 +71,7 @@ fn main() {
 
     let mut parser = Parser::new(file);
     let mut code_writer = CodeWriter::new(outputfile);
+    code_writer.write_init();
     code_writer.set_file_name(filename.split('/').rev().nth(1).unwrap());
     if let Err(e) = vm_to_asm(&mut parser, &mut code_writer) {
         print_error(&e);

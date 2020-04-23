@@ -29,6 +29,22 @@ impl <W: Write> CodeWriter<W> {
         self.filename = filename.to_string();
     }
 
+    /// VMの初期化（これは「ブートストラップ」と呼ばれる）
+    /// を行うアセンブリコードを書く。このコードは出力ファイルの先頭に
+    /// 配置しなければならない
+    pub fn write_init(&mut self) {
+        let asm = format!(concat!(
+            "@256 \n", // SP(スタックポインタ)を256に設定する
+            "D=A \n",
+            "@SP \n",
+            "M=D \n",
+
+        ));
+
+        let _ = self.asm.write(asm.as_bytes());
+        self.rows += 4;
+    }
+
     /// labelコマンドを行うアセンブリコードを書く
     pub fn write_label(&mut self, label: &str) -> Result<(), String> {
         /*
