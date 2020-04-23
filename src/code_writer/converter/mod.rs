@@ -240,46 +240,12 @@ pub fn push_constant(n: isize) -> (String, usize) {
 
 /// segment[index]の値をスタック上にpushする
 pub fn push_local(index: isize) -> (String, usize) {
-    (format!(concat!(
-        "@LCL \n",
-        "D=M \n", // LCLレジスタの値をDレジスタへ
-        "@{} \n", // indexの値をAレジスタへ
-        "A=D+A \n", // LCLレジスタの値とindexの値を足してAレジスタへ
-        "D=M \n", // segment[index]の値をDレジスタへ
-        "@SP \n",
-        "M=D \n", // スタックの先頭にsegment[index]の値を入れる
-        inc!("SP"), // SPレジスタの値をインクリメントする
-    ), index), 7 + inc!())
+    (push2stack!("LCL", index), push2stack!())
 }
 
 /// SPの番地の値をlocalが指す番地+indexの番地に書き込む
 pub fn pop_local(index: isize) -> (String, usize) {
-    (format!(
-        concat!(
-            /* labelセグメントはスタックではないので
-            データの入出力にpop2d、pop2mマクロは使えない
-
-            LCLの値の番地とindexを足した結果をR13レジスタに保存する
-            SPをポップしてDレジスタに入れる
-            R13レジスタの番地をAに入れ、MレジスタでR13レジスタの中身を受け取る
-            Mレジスタの値をAレジスタに入れる
-            MレジスタにDレジスタの値を入れる
-            */
-            // 先にアドレスの足し算をする
-            "@LCL \n", 
-            "D=M \n", // LCLレジスタの値をDレジスタへ
-            "@{} \n", // indexの値をAレジスタへ
-            "D=D+A \n", // D+Aを計算して出てきた番地をDレジスタに入れる
-            "@R13 \n",
-            "M=D \n", // R13にDレジスタに入っている計算結果を保存する
-            
-            pop2d!("SP"), // SPをポップしてDレジスタに入れる
-            "@R13 \n",
-            "A=M \n", // R13レジスタの値(LCL+indexの計算結果)をAレジスタに入れる。
-            "M=D \n", // スタックからポップしたレジスタをLCL+indexの計算結果の
-                   // 番地に保存する
-        ), index
-    ), 6 + pop2d!() + 3)
+    (pop2s!("LCL", index), pop2s!())
 }
 
 /// segment[index]の値をスタック上にpushする
