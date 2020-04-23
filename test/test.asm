@@ -44,7 +44,7 @@ M=M-1
 @16
 D=A
 @some
-M=D // som番地に16を代入
+M=D // some番地に16を代入
 A=M // some番地の値をAレジスタに代入
 D=M // some番地の値の番地の値をDレジスタに代入
 @some2

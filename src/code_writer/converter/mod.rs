@@ -186,7 +186,7 @@ macro_rules! pop2s {
             MレジスタにDレジスタの値を入れる
             */
             "@", $segment," \n", 
-            "D=M \n", // LCLレジスタの値をDレジスタへ
+            "D=M \n", // segmentレジスタの値をDレジスタへ
             "@{} \n", // indexの値をAレジスタへ
             "D=D+A \n", // D+Aを計算して出てきた番地をDレジスタに入れる
             "@R13 \n",
@@ -194,9 +194,9 @@ macro_rules! pop2s {
             
             pop2d!("SP"), // SPをポップしてDレジスタに入れる
             "@R13 \n",
-            "A=M \n", // R13レジスタの値(LCL+indexの計算結果)をAレジスタに入れる。
-            "M=D \n", // スタックからpopしたレジスタを$segment+$indexの計算結果の
-                   // 番地に保存する
+            "A=M \n", // R13レジスタの値(segment+indexの計算結果)をAレジスタへ
+            "M=D \n", // スタックからpopしたレジスタをsegment+indexの計算結果の
+                      // 番地に保存する
         ), $index)
     };
     () => { 6 + pop2d!() + 3 }
