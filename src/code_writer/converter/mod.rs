@@ -254,6 +254,17 @@ pub fn pop_argument(index: isize) -> (String, usize) {
     (pop2s!("ARG", index), pop2s!())
 }
 
+/// SPの番地の値をnthisが指す番地+indexの番地に書き込む
+pub fn pop_this(index: isize) -> (String, usize) {
+    (pop2s!("THIS", index), pop2s!())
+}
+
+/// SPの番地の値をthatが指す番地+indexの番地に書き込む
+pub fn pop_that(index: isize) -> (String, usize) {
+    (pop2s!("THAT", index), pop2s!())
+}
+
+
 #[cfg(test)]
 mod test {
     use super::*;
