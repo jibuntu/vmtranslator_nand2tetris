@@ -31,6 +31,10 @@ fn vm_to_asm<R, W>(p: &mut Parser<R>, cw: &mut CodeWriter<W>)
                 cw.write_push_pop("push", &p.arg1().unwrap(), 
                                   p.arg2().unwrap())?;
             },
+            CommandType::POP => {
+                cw.write_push_pop("pop", &p.arg1().unwrap(), 
+                                  p.arg2().unwrap())?;
+            }
             CommandType::ARITHMETIC => {
                 cw.write_arithmetic(p.arg1().unwrap().as_str())?;
             }
