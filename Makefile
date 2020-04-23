@@ -1,19 +1,7 @@
 # 他のディレクトリにある問題用の*.vmファイルをコンパイルするためのMakefile
 
-simpleadd:
-	cargo run ../StackArithmetic/SimpleAdd/SimpleAdd.vm ../StackArithmetic/SimpleAdd/SimpleAdd.asm
-
-stacktest:
-	cargo run ../StackArithmetic/StackTest/StackTest.vm ../StackArithmetic/StackTest/StackTest.asm
-
-basictest:
-	cargo run ../MemoryAccess/BasicTest/BasicTest.vm ../MemoryAccess/BasicTest/BasicTest.asm
-
-pointertest:
-	cargo run ../MemoryAccess/PointerTest/PointerTest.vm ../MemoryAccess/PointerTest/PointerTest.asm
-
-statictest:
-	cargo run ../MemoryAccess/StaticTest/StaticTest.vm ../MemoryAccess/StaticTest/StaticTest.asm
+basicloop:
+	cargo run ../ProgramFlow/BasicLoop/BasicLoop.vm ../ProgramFlow/BasicLoop/BasicLoop.asm
 
 push:
 	cargo run ./test/push/test.vm ./test/push/test.asm
