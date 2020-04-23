@@ -3,6 +3,9 @@
 basicloop:
 	cargo run ../ProgramFlow/BasicLoop/BasicLoop.vm ../ProgramFlow/BasicLoop/BasicLoop.asm
 
+goto:
+	cargo run ./test/goto/test.vm ./test/goto/test.asm
+
 push:
 	cargo run ./test/push/test.vm ./test/push/test.asm
 
