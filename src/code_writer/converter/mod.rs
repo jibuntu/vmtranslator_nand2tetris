@@ -282,9 +282,19 @@ pub fn pop_local(index: isize) -> (String, usize) {
     ), 6 + pop2d!() + 3)
 }
 
+/// segment[index]の値をスタック上にpushする
+pub fn push_argument(index: isize) -> (String, usize) {
+    (push2stack!("ARG", index), push2stack!())
+}
+
 /// SPの番地の値をargumentが指す番地+indexの番地に書き込む
 pub fn pop_argument(index: isize) -> (String, usize) {
     (pop2s!("ARG", index), pop2s!())
+}
+
+/// segment[index]の値をスタック上にpushする
+pub fn push_this(index: isize) -> (String, usize) {
+    (push2stack!("THIS", index), push2stack!())
 }
 
 /// SPの番地の値をthisが指す番地+indexの番地に書き込む
@@ -292,9 +302,19 @@ pub fn pop_this(index: isize) -> (String, usize) {
     (pop2s!("THIS", index), pop2s!())
 }
 
+/// segment[index]の値をスタック上にpushする
+pub fn push_that(index: isize) -> (String, usize) {
+    (push2stack!("THAT", index), push2stack!())
+}
+
 /// SPの番地の値をthatが指す番地+indexの番地に書き込む
 pub fn pop_that(index: isize) -> (String, usize) {
     (pop2s!("THAT", index), pop2s!())
+}
+
+/// segment[index]の値をスタック上にpushする
+pub fn push_temp(index: isize) -> (String, usize) {
+    (push2stack!("R5", index), push2stack!())
 }
 
 /// SPの番地の値をtempが指す番地+indexの番地に書き込む
