@@ -29,6 +29,16 @@ impl <W: Write> CodeWriter<W> {
         self.filename = filename.to_string();
     }
 
+    /// labelコマンドを行うアセンブリコードを書く
+    pub fn write_label(&mut self, label: &str) -> Result<(), String> {
+        /*
+        labelが定義された関数内のみで有効ということは関数名を先頭に
+        つける必要があるかもしれない
+        */
+        let _ = self.asm.write(format!("({}) \n", label).as_bytes());
+        Ok(())
+    }
+
     /// 与えられた算術コマンドをアセンブリコードに変換し、それを書き込む
     pub fn write_arithmetic(&mut self, command: &str) -> Result<(), String> {
         let (asm, rows) = match command {

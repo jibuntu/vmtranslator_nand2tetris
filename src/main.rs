@@ -34,10 +34,11 @@ fn vm_to_asm<R, W>(p: &mut Parser<R>, cw: &mut CodeWriter<W>)
             CommandType::POP => {
                 cw.write_push_pop("pop", &p.arg1().unwrap(), 
                                   p.arg2().unwrap())?;
-            }
+            },
             CommandType::ARITHMETIC => {
                 cw.write_arithmetic(p.arg1().unwrap().as_str())?;
-            }
+            },
+            CommandType::LABEL => cw.write_label(&p.arg1().unwrap())?,
             CommandType::None => return Err(format!("{} は無効なコマンドです",
                                                     p.arg1().unwrap())),
             _ => return Err(format!("{:?} は未実装のコマンドです", 
