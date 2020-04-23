@@ -69,6 +69,7 @@ impl <W: Write> CodeWriter<W> {
                 "argument" => converter::pop_argument(index),
                 "this" => converter::pop_this(index),
                 "that" => converter::pop_that(index),
+                "temp" => converter::pop_temp(index),
                 _ => return Err(format!("{} は無効なセグメントです", segment))
             },
             _ => return Err(format!("{} は無効なコマンドです", command)),

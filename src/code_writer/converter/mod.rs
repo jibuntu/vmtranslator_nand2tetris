@@ -264,6 +264,11 @@ pub fn pop_that(index: isize) -> (String, usize) {
     (pop2s!("THAT", index), pop2s!())
 }
 
+/// SPの番地の値をtempが指す番地+indexの番地に書き込む
+pub fn pop_temp(index: isize) -> (String, usize) {
+    (pop2s!("R5", index), pop2s!())
+}
+
 
 #[cfg(test)]
 mod test {
