@@ -202,6 +202,30 @@ macro_rules! pop2s {
     () => { 6 + pop2d!() + 3 }
 }
 
+
+/// pointer, temp向けのpop2s。
+/// pointer, tempはベースアドレス保持しているのではないので、それぞれの番地に
+/// 直接indexを足した結果の番地を操作する
+macro_rules! pop2s_2 {
+    ($segment:expr, $index:ident) => {
+        format!(concat!(
+            "@", $segment," \n", 
+            "D=A \n", // segmentレジスタの番地をDレジスタへ
+            "@{} \n", // indexの値をAレジスタへ
+            "D=D+A \n", // D+Aを計算して出てきた番地をDレジスタに入れる
+            "@R13 \n",
+            "M=D \n", // R13にDレジスタに入っている計算結果を保存する
+            
+            pop2d!("SP"), // SPをポップしてDレジスタに入れる
+            "@R13 \n",
+            "A=M \n", // R13レジスタの値(segment+indexの計算結果)をAレジスタへ
+            "M=D \n", // スタックからpopしたレジスタをsegment+indexの計算結果の
+                      // 番地に保存する
+        ), $index)
+    };
+    () => { 6 + pop2d!() + 3 }
+}
+
 /// segment[index]をスタックの上にプッシュする
 /// * 第一引数はセグメントのレジスタ名
 /// * 第二引数はindex
@@ -221,6 +245,27 @@ macro_rules! push2stack {
     };
     () => { 7 + inc!() }
 }
+
+/// pointer, temp向けのpop2s。
+/// pointer, tempはベースアドレス保持しているのではないので、それぞれの番地に
+/// 直接indexを足した結果の番地を操作する
+macro_rules! push2stack_2 {
+    ($segment:expr, $index:ident) => {
+        format!(concat!(
+            "@", $segment, " \n",
+            "D=A \n", // segmentレジスタの番地をDレジスタへ
+            "@{} \n", // indexの値をAレジスタへ
+            "A=D+A \n", // segmentレジスタの値とindexの値を足してAレジスタへ
+            "D=M \n", // segment[index]の値をDレジスタへ
+            "@SP \n",
+            "A=M \n", // M[SP]の値をAアドレスへ
+            "M=D \n", // スタックの先頭にsegment[index]の値を入れる
+            inc!("SP"), // SPレジスタの値をインクリメントする
+        ), $index)
+    };
+    () => { 7 + inc!() }
+}
+
 
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
@@ -281,12 +326,12 @@ pub fn pop_that(index: isize) -> (String, usize) {
 
 /// segment[index]の値をスタック上にpushする
 pub fn push_temp(index: isize) -> (String, usize) {
-    (push2stack!("R5", index), push2stack!())
+    (push2stack_2!("R5", index), push2stack_2!())
 }
 
 /// SPの番地の値をtempが指す番地+indexの番地に書き込む
 pub fn pop_temp(index: isize) -> (String, usize) {
-    (pop2s!("R5", index), pop2s!())
+    (pop2s_2!("R5", index), pop2s_2!())
 }
 
 
