@@ -1,0 +1,10 @@
+push constant 5
+push constant 10
+
+// localの初期値は100
+
+pop local 0 // localレジスタの値の番地の0番目(100)にスタックからpopした値(10)が入る
+pop local 1 // localレジスタの値の番地の1番目(101)にスタックからpopした値(5)が入る
+
+push local 1 // 101番目の値(5)がスタックの先頭に入る
+push local 0 // 100番目の値(10)がスタックの先頭に入る

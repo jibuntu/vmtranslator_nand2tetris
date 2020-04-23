@@ -9,6 +9,9 @@ stacktest:
 basictest:
 	cargo run ../MemoryAccess/BasicTest/BasicTest.vm ../MemoryAccess/BasicTest/BasicTest.asm
 
+push:
+	cargo run ./test/push/test.vm ./test/push/test.asm
+
 pop:
 	cargo run ./test/pop/test.vm ./test/pop/test.asm
 
