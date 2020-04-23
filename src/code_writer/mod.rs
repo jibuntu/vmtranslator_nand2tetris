@@ -60,16 +60,14 @@ impl <W: Write> CodeWriter<W> {
     pub fn write_push_pop(&mut self, command: &str, segment: &str, 
                           index: isize) -> Result<(), String> {
         let (asm, rows) = match command {
-            "push" => {
-                match segment {
-                    "constant" => {
-                        converter::push_constant(index)
-                    },
-                    _ => return Err(format!("{} は無効なセグメントです", 
-                                            segment))
-                }
+            "push" => match segment {
+                "constant" => converter::push_constant(index),
+                _ => return Err(format!("{} は無効なセグメントです", segment))
             },
-            "pop" => return Err("POPコマンドは未対応".to_string()),
+            "pop" => match segment {
+                "local" => converter::pop_local(index),
+                _ => return Err(format!("{} は無効なセグメントです", segment))
+            },
             _ => return Err(format!("{} は無効なコマンドです", command)),
         };
 

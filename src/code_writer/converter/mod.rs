@@ -188,6 +188,36 @@ pub fn push_constant(n: isize) -> (String, usize) {
         ), n=n), 5 + inc!())
 }
 
+/// SPの番地の値をlocalが指す番地+indexの番地に書き込む
+pub fn pop_local(index: isize) -> (String, usize) {
+    (format!(
+        concat!(
+            /* labelセグメントはスタックではないので
+            データの入出力にpop2d、pop2mマクロは使えない
+
+            LCLの値の番地とindexを足した結果をR13レジスタに保存する
+            SPをポップしてDレジスタに入れる
+            R1レジスタの番地をAに入れて、MレジスタでR13レジスタの中身を受け取る
+            Mレジスタの値をAレジスタに入れる
+            MレジスタにDレジスタの値を入れる
+            */
+            // 先にアドレスの足し算をする
+            "@LCL \n", 
+            "D=M \n", // LCLレジスタの値をDレジスタへ
+            "@", "{}", " \n", // indexの値をAレジスタへ
+            "D=D+A \n", // D+Aを計算して出てきた番地をDレジスタに入れる
+            "@R13",
+            "M=D", // R13にDレジスタに入っている計算結果を保存する
+            
+            pop2d!("SP"), // SPをポップしてDレジスタに入れる
+            "@R13",
+            "A=M", // R13レジスタの値(LCL+indexの計算結果)をAレジスタに入れる。
+            "M=D", // スタックからポップしたレジスタをLCL+indexの計算結果の
+                   // 番地に保存する
+        ), index
+    ), inc!())
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
