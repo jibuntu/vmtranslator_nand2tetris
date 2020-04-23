@@ -176,8 +176,8 @@ pub fn not() -> (String, usize) {
 /// * 第一引数はセグメントのレジスタ名
 /// * 第二引数はindex
 macro_rules! pop2s {
-    ($segment:expr, $index:expr) => {
-        concat!(
+    ($segment:expr, $index:ident) => {
+        format!(concat!(
             /* 
             セグメントの値の番地とindexを足した結果をR13レジスタに保存する
             SPをポップしてDレジスタに入れる
@@ -187,7 +187,7 @@ macro_rules! pop2s {
             */
             "@", $segment," \n", 
             "D=M \n", // LCLレジスタの値をDレジスタへ
-            "@", $index, " \n", // indexの値をAレジスタへ
+            "@{} \n", // indexの値をAレジスタへ
             "D=D+A \n", // D+Aを計算して出てきた番地をDレジスタに入れる
             "@R13",
             "M=D", // R13にDレジスタに入っている計算結果を保存する
@@ -197,7 +197,7 @@ macro_rules! pop2s {
             "A=M", // R13レジスタの値(LCL+indexの計算結果)をAレジスタに入れる。
             "M=D", // スタックからpopしたレジスタを$segment+$indexの計算結果の
                    // 番地に保存する
-        )
+        ), $index)
     };
     () => { 6 + pop2d!() + 3 }
 }
