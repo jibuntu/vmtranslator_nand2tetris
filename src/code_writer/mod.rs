@@ -39,6 +39,19 @@ impl <W: Write> CodeWriter<W> {
         Ok(())
     }
 
+    /// gotoコマンドを行うアセンブリコードを書く
+    pub fn write_goto(&mut self, label: &str) -> Result<(), String> {
+        let asm = format!(concat!(
+            "@{} \n",
+            "0;JMP \n"
+        ), label);
+
+        let _ = self.asm.write(asm.as_bytes());
+        self.rows += 2;
+
+        Ok(())
+    }
+
     /// 与えられた算術コマンドをアセンブリコードに変換し、それを書き込む
     pub fn write_arithmetic(&mut self, command: &str) -> Result<(), String> {
         let (asm, rows) = match command {
