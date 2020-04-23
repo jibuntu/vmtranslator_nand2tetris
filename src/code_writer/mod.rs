@@ -62,7 +62,8 @@ impl <W: Write> CodeWriter<W> {
         let (asm, rows) = match command {
             "push" => match segment {
                 "constant" => converter::push_constant(index),
-                _ => return Err(format!("{} は無効なセグメントです", segment))
+                _ => return Err(format!("push {} は無効なセグメントです", 
+                                        segment))
             },
             "pop" => match segment {
                 "local" => converter::pop_local(index),
@@ -70,7 +71,8 @@ impl <W: Write> CodeWriter<W> {
                 "this" => converter::pop_this(index),
                 "that" => converter::pop_that(index),
                 "temp" => converter::pop_temp(index),
-                _ => return Err(format!("{} は無効なセグメントです", segment))
+                _ => return Err(format!("pop {} は無効なセグメントです", 
+                                        segment))
             },
             _ => return Err(format!("{} は無効なコマンドです", command)),
         };
