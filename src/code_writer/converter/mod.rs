@@ -202,6 +202,25 @@ macro_rules! pop2s {
     () => { 6 + pop2d!() + 3 }
 }
 
+/// segment[index]をスタックの上にプッシュする
+/// * 第一引数はセグメントのレジスタ名
+/// * 第二引数はindex
+macro_rules! push2stack {
+    ($segment:expr, $index:ident) => {
+        format!(concat!(
+            "@", $segment, " \n",
+            "D=M \n", // segmentレジスタの値をDレジスタへ
+            "@{} \n", // indexの値をAレジスタへ
+            "A=D+A \n", // segmentレジスタの値とindexの値を足してAレジスタへ
+            "D=M \n", // segment[index]の値をDレジスタへ
+            "@SP \n",
+            "M=D \n", // スタックの先頭にsegment[index]の値を入れる
+            inc!("SP"), // SPレジスタの値をインクリメントする
+        ), index)
+    };
+    () => { 7 + inc!() }
+}
+
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
 pub fn push_constant(n: isize) -> (String, usize) {
