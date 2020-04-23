@@ -249,6 +249,11 @@ pub fn pop_local(index: isize) -> (String, usize) {
     ), 6 + pop2d!() + 3)
 }
 
+/// SPの番地の値をargumentが指す番地+indexの番地に書き込む
+pub fn pop_argument(index: isize) -> (String, usize) {
+    (pop2s!("ARG", index), pop2s!())
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

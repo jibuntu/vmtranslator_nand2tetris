@@ -66,6 +66,7 @@ impl <W: Write> CodeWriter<W> {
             },
             "pop" => match segment {
                 "local" => converter::pop_local(index),
+                "argument" => converter::pop_argument(index),
                 _ => return Err(format!("{} は無効なセグメントです", segment))
             },
             _ => return Err(format!("{} は無効なコマンドです", command)),
