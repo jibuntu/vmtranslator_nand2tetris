@@ -62,6 +62,7 @@ impl <W: Write> CodeWriter<W> {
         let (asm, rows) = match command {
             "push" => match segment {
                 "constant" => converter::push_constant(index),
+                "local"=> converter::push_local(index),
                 _ => return Err(format!("push {} は無効なセグメントです", 
                                         segment))
             },

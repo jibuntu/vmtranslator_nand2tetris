@@ -219,6 +219,20 @@ pub fn push_constant(n: isize) -> (String, usize) {
         ), n=n), 5 + inc!())
 }
 
+/// segment[index]の値をスタック上にpushする
+pub fn push_local(index: isize) -> (String, usize) {
+    (format!(concat!(
+        "@LCL \n",
+        "D=M \n", // LCLレジスタの値をDレジスタへ
+        "@{} \n", // indexの値をAレジスタへ
+        "A=D+A \n", // LCLレジスタの値とindexの値を足してAレジスタへ
+        "D=M \n", // segment[index]の値をDレジスタへ
+        "@SP \n",
+        "M=D \n", // スタックの先頭にsegment[index]の値を入れる
+        inc!("SP"), // SPレジスタの値をインクリメントする
+    ), index), 7 + inc!())
+}
+
 /// SPの番地の値をlocalが指す番地+indexの番地に書き込む
 pub fn pop_local(index: isize) -> (String, usize) {
     (format!(
