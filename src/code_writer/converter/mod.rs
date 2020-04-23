@@ -214,6 +214,7 @@ macro_rules! push2stack {
             "A=D+A \n", // segmentレジスタの値とindexの値を足してAレジスタへ
             "D=M \n", // segment[index]の値をDレジスタへ
             "@SP \n",
+            "A=M \n", // M[SP]の値をAアドレスへ
             "M=D \n", // スタックの先頭にsegment[index]の値を入れる
             inc!("SP"), // SPレジスタの値をインクリメントする
         ), $index)
