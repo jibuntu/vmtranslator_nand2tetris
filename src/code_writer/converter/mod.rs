@@ -346,6 +346,25 @@ pub fn pop_pointer(index: isize) -> (String, usize) {
     (pop2s_2!("THIS", index), pop2s_2!())
 }
 
+pub fn push_static(index: isize, filename: &str) -> (String, usize) {
+    (format!(concat!(
+        "@{}.{n} \n",
+        "D=M \n",
+        "@SP \n",
+        "A=M \n", // SPレジスタの値をAレジスタに入れる
+        "M=D \n", // SPレジスタの値の番地にnを入れる
+        inc!("SP"), // SPレジスタの値をインクリメントする
+    ), filename, n=index), 5 + inc!())
+}
+
+pub fn pop_static(index: isize, filename: &str) -> (String, usize) {
+    (format!(concat!(
+        pop2d!("SP"),
+        "@{}.{n} \n",
+        "M=D \n",
+    ), filename, n=index), pop2d!() + 2)
+}
+
 
 #[cfg(test)]
 mod test {

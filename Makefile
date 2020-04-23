@@ -12,6 +12,9 @@ basictest:
 pointertest:
 	cargo run ../MemoryAccess/PointerTest/PointerTest.vm ../MemoryAccess/PointerTest/PointerTest.asm
 
+statictest:
+	cargo run ../MemoryAccess/StaticTest/StaticTest.vm ../MemoryAccess/StaticTest/StaticTest.asm
+
 push:
 	cargo run ./test/push/test.vm ./test/push/test.asm
 
