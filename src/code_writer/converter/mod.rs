@@ -73,21 +73,22 @@ macro_rules! binfunc {
 macro_rules! ifd {
     ($var:expr, $jump:expr, $rows:expr) => {
         format!(concat!(
-/* 01 */    "@{adress_true} \n", // Dが0のときのジャンプ先を指定
-/* 02 */    "D;", $jump, " \n", // Dが0ならadress_trueにジャンプする
-/* 03 */    "@0 \n", // Dが0でない場合
-/* 04 */    "D=A \n", // Dに0を入れる
-/* 05 */    "@{adress_end} \n", // trueのときに飛ぶコードが終わった所を指定
-/* 06 */    "0;JMP \n", // adress_endへジャンプする
-/* 07 */    "D=-1 \n", // Dに-1を入れる // D==0ならここに飛ぶ
-/* 08 */    "@", $var, " \n", // address_endで飛んでくる場所
+/* 01 */    "@{t_address} \n",  // 条件がtrueのときのジャンプ先を指定
+/* 02 */    "D;", $jump, " \n", // 条件がtrueならt_adressにジャンプする
+/* 03 */    "@0 \n",            // 条件がfalseの場合
+/* 04 */    "D=A \n",           // Dレジスタに0を入れる
+/* 05 */    "@{e_address} \n",  // e_addressをジャンプ先として指定
+/* 06 */    "0;JMP \n",         // 無条件でe_addressへジャンプする
+/* 07 */    "D=-1 \n",          // t_adressのジャンプ先、Dレジスタに-1を入れる
+/* 08 */    "@", $var, " \n",   // e_addressのジャンプ先
 /* 09 */    "A=M \n",
-/* 10 */    "M=D \n", // $var変数にDの値を入れる
-            inc!($var) // インクリメントする
-        ), adress_true=($rows + 6), adress_end=($rows + 7))
+/* 10 */    "M=D \n",           // $var変数にDレジスタの値を入れる
+            inc!($var)          // インクリメントする
+        ), t_address=($rows + 6), e_address=($rows + 7))
     };
     () => { 10 + inc!() };
 }
+
 
 /// addコマンド。
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
