@@ -102,6 +102,8 @@ impl<R: Read> Parser<R> {
 
         if words.len() == 3 {
             return Some(words[1].to_string());
+        } else if words.len() == 2 {
+            return Some(words[1].to_string());
         } else if words.len() == 1 {
             return Some(words[0].to_string());
         }
