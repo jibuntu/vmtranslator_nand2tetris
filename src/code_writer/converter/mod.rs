@@ -334,6 +334,18 @@ pub fn pop_temp(index: isize) -> (String, usize) {
     (pop2s_2!("R5", index), pop2s_2!())
 }
 
+/// segment[index]の値をスタック上にpushする。
+/// pointerはthisとthatの間にマッピングされる。
+pub fn push_pointer(index: isize) -> (String, usize) {
+    (push2stack_2!("THIS", index), push2stack_2!())
+}
+
+/// SPの番地の値をtempが指す番地+indexの番地に書き込む
+/// pointerはthisとthatの間にマッピングされる。
+pub fn pop_pointer(index: isize) -> (String, usize) {
+    (pop2s_2!("THIS", index), pop2s_2!())
+}
+
 
 #[cfg(test)]
 mod test {

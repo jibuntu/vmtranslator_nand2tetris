@@ -67,6 +67,7 @@ impl <W: Write> CodeWriter<W> {
                 "this" => converter::push_this(index),
                 "that" => converter::push_that(index),
                 "temp" => converter::push_temp(index),
+                "pointer" => converter::push_pointer(index),
                 _ => return Err(format!("push {} は無効なセグメントです", 
                                         segment))
             },
@@ -76,6 +77,7 @@ impl <W: Write> CodeWriter<W> {
                 "this" => converter::pop_this(index),
                 "that" => converter::pop_that(index),
                 "temp" => converter::pop_temp(index),
+                "pointer" => converter::pop_pointer(index),
                 _ => return Err(format!("pop {} は無効なセグメントです", 
                                         segment))
             },
