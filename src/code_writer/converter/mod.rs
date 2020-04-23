@@ -172,6 +172,37 @@ pub fn not() -> (String, usize) {
 }
 
 
+/// スタックの一番上のデータをpopし、それをsegment[index]に格納する。
+/// * 第一引数はセグメントのレジスタ名
+/// * 第二引数はindex
+macro_rules! pop2s {
+    ($segment:expr, $index:expr) => {
+        concat!(
+            /* 
+            セグメントの値の番地とindexを足した結果をR13レジスタに保存する
+            SPをポップしてDレジスタに入れる
+            R13レジスタの番地をAに入れ、MレジスタでR13レジスタの中身を受け取る
+            Mレジスタの値をAレジスタに入れる
+            MレジスタにDレジスタの値を入れる
+            */
+            "@", $segment," \n", 
+            "D=M \n", // LCLレジスタの値をDレジスタへ
+            "@", $index, " \n", // indexの値をAレジスタへ
+            "D=D+A \n", // D+Aを計算して出てきた番地をDレジスタに入れる
+            "@R13",
+            "M=D", // R13にDレジスタに入っている計算結果を保存する
+            
+            pop2d!("SP"), // SPをポップしてDレジスタに入れる
+            "@R13",
+            "A=M", // R13レジスタの値(LCL+indexの計算結果)をAレジスタに入れる。
+            "M=D", // スタックからpopしたレジスタを$segment+$indexの計算結果の
+                   // 番地に保存する
+        )
+    };
+    () => { 6 + pop2d!() + 3 }
+}
+
+
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
 pub fn push_constant(n: isize) -> (String, usize) {
     /*
@@ -215,7 +246,7 @@ pub fn pop_local(index: isize) -> (String, usize) {
             "M=D", // スタックからポップしたレジスタをLCL+indexの計算結果の
                    // 番地に保存する
         ), index
-    ), inc!())
+    ), 6 + pop2d!() + 3)
 }
 
 #[cfg(test)]
