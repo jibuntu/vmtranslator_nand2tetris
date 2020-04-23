@@ -216,7 +216,7 @@ macro_rules! push2stack {
             "@SP \n",
             "M=D \n", // スタックの先頭にsegment[index]の値を入れる
             inc!("SP"), // SPレジスタの値をインクリメントする
-        ), index)
+        ), $index)
     };
     () => { 7 + inc!() }
 }
@@ -287,7 +287,7 @@ pub fn pop_argument(index: isize) -> (String, usize) {
     (pop2s!("ARG", index), pop2s!())
 }
 
-/// SPの番地の値をnthisが指す番地+indexの番地に書き込む
+/// SPの番地の値をthisが指す番地+indexの番地に書き込む
 pub fn pop_this(index: isize) -> (String, usize) {
     (pop2s!("THIS", index), pop2s!())
 }
