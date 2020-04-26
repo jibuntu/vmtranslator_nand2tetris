@@ -86,7 +86,13 @@ for arg in ${args[@]}; do
             $vmtranslator $path".vm" $path".asm"
         fi
         printf $path" : "
-        test $path".tst"
+        printf "\x1b[31m" # 文字を赤色にする
+        test_result=$(test $path".tst")
+        if [[ $test_result == "End of script - Comparison ended successfully" ]]; then
+            printf "\x1b[32m" # 文字を黄緑色にする
+            echo $test_result
+        fi
+        printf "\x1b[0m" # 文字色を戻す
     done
 done
 
