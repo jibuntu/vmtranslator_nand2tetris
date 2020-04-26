@@ -2,12 +2,16 @@
 //! symbolが被らないようにする。
 
 pub struct SymbolManager {
+    file_name: String,
+    function_name: String,
     ifd_count: usize
 }
 
 impl SymbolManager {
     pub fn new() -> SymbolManager {
         SymbolManager {
+            file_name: String::new(),
+            function_name: String::new(),
             ifd_count: 0
         }
     }
@@ -17,6 +21,11 @@ impl SymbolManager {
         let s = format!("symbol-ifd-{}", self.ifd_count);
         self.ifd_count+=1;
         s
+    }
+
+    /// gotoのときに使うラベルを取得する
+    pub fn get_goto_symbol(&self, label: &str) -> String {
+        format!("symbol-goto-{}", label)
     }
 }
 

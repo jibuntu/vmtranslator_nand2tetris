@@ -49,15 +49,19 @@ impl <W: Write> CodeWriter<W> {
     /// labelコマンドを行うアセンブリコードを書く
     pub fn write_label(&mut self, label: &str) -> Result<(), String> {
         /*
-        labelが定義された関数内のみで有効ということは関数名を先頭に
+        labelが定義された関数内のみで有効ということはファイル名と関数名を先頭に
         つける必要があるかもしれない
         */
+        // labelが被らないようにSymbolManagerを使う
+        let label = self.sm.get_goto_symbol(label);
         let _ = self.asm.write(format!("({}) \n", label).as_bytes());
         Ok(())
     }
 
     /// gotoコマンドを行うアセンブリコードを書く
     pub fn write_goto(&mut self, label: &str) -> Result<(), String> {
+        // 元のラベルをSymbolManagerを使って変換する
+        let label = self.sm.get_goto_symbol(label);
         let asm = format!(concat!(
             "@{} \n",
             "0;JMP \n"
