@@ -78,8 +78,7 @@ for arg in ${args[@]}; do
     
     for path in ${result[@]}; do
         if [[ $compile == "true" ]]; then
-            echo ""
-            echo $vmtranslator $path".vm" $path".asm"
+            printf "[cmpiled] "
             $vmtranslator $path".vm" $path".asm"
         fi
         printf $path" : "
