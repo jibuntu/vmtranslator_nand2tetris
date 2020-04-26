@@ -1,11 +1,13 @@
-push constant 10
+push constant 0 // SP=257
 
-if-goto end
+if-goto end // SPの最上位の値は0なのでジャンプしない  SP=256
 
-push constant 0
+push constant 10 // SP=257
 
-if-goto end
+if-goto end // SPの最上位の値は0以外(10)なのでジャンプする  // SP=256
 
-push constant 1
+push constant 1 // 呼ばれないコマンド
 
 label end
+
+push constant 5  // SP=257
