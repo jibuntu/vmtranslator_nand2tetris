@@ -75,6 +75,10 @@ for arg in ${args[@]}; do
         echo $arg"というテストはありません"
         exit
     fi
+
+    if [[ $compile == "true" ]]; then
+        cargo build
+    fi
     
     for path in ${result[@]}; do
         if [[ $compile == "true" ]]; then
