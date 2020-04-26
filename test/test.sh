@@ -40,6 +40,14 @@ get_test_list() {
     ifarg "eq_long" "./eq/long/long"; result+=($path)
     ifarg "add" "./add/add"; result+=($path)
     ifarg "sub" "./sub/sub"; result+=($path)
+    # 7章のテスト
+    ifarg "simpleadd" "../../../07/StackArithmetic/SimpleAdd/SimpleAdd"; result+=($path)
+    ifarg "stacktest" "../../../07/StackArithmetic/StackTest/StackTest"; result+=($path)
+    ifarg "basictest" "../../../07/MemoryAccess/BasicTest/BasicTest"; result+=($path)
+    ifarg "pointertest" "../../../07/MemoryAccess/PointerTest/PointerTest"; result+=($path)
+    ifarg "statictest" "../../../07/MemoryAccess/StaticTest/StaticTest"; result+=($path)
+
+
 }
 
 args=() # 引数のリスト
