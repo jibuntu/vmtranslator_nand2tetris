@@ -13,7 +13,6 @@ use symbol_manager::SymbolManager;
 pub struct CodeWriter<W> {
     filename: String,
     sm: SymbolManager,
-    rows: usize,
     asm: W
 }
 
@@ -23,7 +22,6 @@ impl <W: Write> CodeWriter<W> {
         CodeWriter {
             filename: String::new(),
             sm: SymbolManager::new(),
-            rows: 0,
             asm: stream,
         }
     }
@@ -46,7 +44,6 @@ impl <W: Write> CodeWriter<W> {
         ));
 
         let _ = self.asm.write(asm.as_bytes());
-        self.rows += 4;
     }
 
     /// labelコマンドを行うアセンブリコードを書く
@@ -67,14 +64,13 @@ impl <W: Write> CodeWriter<W> {
         ), label);
 
         let _ = self.asm.write(asm.as_bytes());
-        self.rows += 2;
 
         Ok(())
     }
 
     /// 与えられた算術コマンドをアセンブリコードに変換し、それを書き込む
     pub fn write_arithmetic(&mut self, command: &str) -> Result<(), String> {
-        let (asm, rows) = match command {
+        let asm = match command {
             "add" => converter::add(),
             "sub" => converter::sub(),
             "neg" => converter::neg(),
@@ -88,12 +84,11 @@ impl <W: Write> CodeWriter<W> {
         };
 
         let asm_code = format!(concat!(
-            "// [start: {}] {c} \n",
+            "// [start] {c} \n",
             "{}",
-            "// [end: {}] {c} \n"
-        ), self.rows, asm, self.rows+rows-1, c=command);
+            "// [end] {c} \n"
+        ), asm, c=command);
         let _ = self.asm.write(asm_code.as_bytes());
-        self.rows += rows;
 
         Ok(())
     }
@@ -102,7 +97,7 @@ impl <W: Write> CodeWriter<W> {
     /// 変換し、それを書き込む
     pub fn write_push_pop(&mut self, command: &str, segment: &str, 
                           index: isize) -> Result<(), String> {
-        let (asm, rows) = match command {
+        let asm = match command {
             "push" => match segment {
                 "constant" => converter::push_constant(index),
                 "local" => converter::push_local(index),
@@ -130,12 +125,11 @@ impl <W: Write> CodeWriter<W> {
         };
 
         let asm_code = format!(concat!(
-            "// [start: {}] {c} {s} {i} \n",
+            "// [start] {c} {s} {i} \n",
             "{}",
-            "// [end: {}] {c} {s} {i} \n"
-        ), self.rows, asm, self.rows+rows-1, c=command, s=segment, i=index);
+            "// [end] {c} {s} {i} \n"
+        ), asm, c=command, s=segment, i=index);
         let _ = self.asm.write(asm_code.as_bytes());
-        self.rows += rows;
         Ok(())
     }
 }
@@ -151,11 +145,7 @@ mod test {
     #[test]
     fn test_code_writer() {
         let asm = Cursor::new(Vec::new());
-        let mut cw = CodeWriter::new(asm);
-        cw.write_push_pop("push", "constant", 1).unwrap();
-        cw.write_push_pop("push", "constant", 2).unwrap();
-        cw.write_arithmetic("add").unwrap();
-        assert_eq!(cw.rows, 24);
+        let _cw = CodeWriter::new(asm);
     }
 
     #[test]
@@ -166,7 +156,7 @@ mod test {
         cw.write_push_pop("push", "constant", 2).unwrap();
 
         let mut asm = format!(concat!(
-            "// [start: 0] push constant {n} \n",
+            "// [start] push constant {n} \n",
             "@{n} \n",
             "D=A \n",
             "@SP \n",
@@ -174,11 +164,11 @@ mod test {
             "M=D \n",
             "@SP \n",
             "M=M+1 \n", 
-            "// [end: 6] push constant {n} \n"
+            "// [end] push constant {n} \n"
         ), n=1);
 
         asm += &format!(concat!(
-            "// [start: 7] push constant {n} \n",
+            "// [start] push constant {n} \n",
             "@{n} \n",
             "D=A \n",
             "@SP \n",
@@ -186,10 +176,9 @@ mod test {
             "M=D \n",
             "@SP \n",
             "M=M+1 \n", 
-            "// [end: 13] push constant {n} \n"
+            "// [end] push constant {n} \n"
         ), n=2);
 
-        assert_eq!(cw.rows, 14);
         assert_eq!(cw.asm.get_ref(), &asm.into_bytes());
         println!("{}", String::from_utf8(cw.asm.get_ref().to_vec()).unwrap());
 

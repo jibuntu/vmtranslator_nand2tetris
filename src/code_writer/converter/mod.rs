@@ -11,7 +11,6 @@ macro_rules! inc {
             "M=M+1 \n"
         )
     };
-    () => { 2 };
 }
 
 /// 特定の変数の値をdecrementするためのアセンブリコードを出力するマクロ
@@ -22,7 +21,6 @@ macro_rules! dec {
             "M=M-1 \n"
         )
     };
-    () => { 2 };
 }
 
 /// 特定の変数の値をDレジスタにpopするマクロ
@@ -34,7 +32,6 @@ macro_rules! pop2d {
             "D=M \n" // Dレジスタに数値を入れる
         )
     };
-    () => { dec!() + 2 };
 }
 
 /// 特定の変数の値をMレジスタにpopするマクロ
@@ -45,7 +42,6 @@ macro_rules! pop2m {
             "A=M \n", 
         )
     };
-    () => { dec!() + 1 };
 }
 
 /// ２変数関数（binary functoin）の計算を行うマクロ。
@@ -61,7 +57,6 @@ macro_rules! binfunc {
             inc!($var) // SPレジスタの値をインクリメントする
         )
     };
-    () => { pop2d!() + pop2m!() + 1 + inc!() };
 }
 
 
@@ -88,33 +83,32 @@ macro_rules! ifd {
             inc!($var)              // インクリメントする
         ), t_label=$label, f_label=$label)
     };
-    () => { 10 + inc!() };
 }
 
 
 /// addコマンド。
 /// スタックから2つpopして足し算をする。その結果をスタックに入れる 
-pub fn add() -> (String, usize) {
-    (binfunc!("SP", "+").to_string(), binfunc!())
+pub fn add() -> String {
+    binfunc!("SP", "+").to_string()
 }
 
 /// subコマンド
-pub fn sub() -> (String, usize) {
-    (binfunc!("SP", "-").to_string(), binfunc!())
+pub fn sub() -> String {
+    binfunc!("SP", "-").to_string()
 }
 
 /// negコマンド
-pub fn neg() -> (String, usize) {
-    (concat!(
+pub fn neg() -> String {
+    concat!(
         pop2m!("SP"),
         "M=-M \n",
         inc!("SP"),
-    ).to_string(), pop2m!() + 1 + inc!())
+    ).to_string()
 }
 
 /// eqコマンドを変換する関数。引数は現在のアセンブリコードの行数。
 /// trueなら0、falseなら-1がスタックに入る
-pub fn eq(label: &str) -> (String, usize) {
+pub fn eq(label: &str) -> String {
     /*
     引き算をした結果のMが0かどうか
     */
@@ -123,12 +117,12 @@ pub fn eq(label: &str) -> (String, usize) {
     asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
     asm += &ifd!("SP", "JEQ", label);
     
-    (asm, binfunc!() + pop2d!() + ifd!())
+    asm
 }
 
 /// gtコマンドを変換する関数。引数は現在のアセンブリコードの行数。
 /// trueなら0、falseなら-1がスタックに入る
-pub fn gt(label: &str) -> (String, usize) {
+pub fn gt(label: &str) -> String {
     let mut asm = String::new();
     /*
     引き算をした結果が0より大きければtrue
@@ -137,12 +131,12 @@ pub fn gt(label: &str) -> (String, usize) {
     asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
     asm += &ifd!("SP", "JGT", label);
 
-    (asm, binfunc!() + pop2d!() + ifd!())
+    asm
 }
 
 /// ltコマンドを変換する関数。引数は現在のアセンブリコードの行数。
 /// trueなら0、falseなら-1がスタックに入る
-pub fn lt(label: &str) -> (String, usize) {
+pub fn lt(label: &str) -> String {
     let mut asm = String::new();
     /*
     引き算をした結果が0より小さければtrue
@@ -151,26 +145,26 @@ pub fn lt(label: &str) -> (String, usize) {
     asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
     asm += &ifd!("SP", "JLT", label);
 
-    (asm, binfunc!() + pop2d!() + ifd!())
+    asm
 }
 
 /// andコマンド
-pub fn and() -> (String, usize) {
-    (binfunc!("SP", "&").to_string(), binfunc!())
+pub fn and() -> String {
+    binfunc!("SP", "&").to_string()
 }
 
 /// orコマンド
-pub fn or() -> (String, usize) {
-    (binfunc!("SP", "|").to_string(), binfunc!())
+pub fn or() -> String {
+    binfunc!("SP", "|").to_string()
 }
 
 /// notコマンド
-pub fn not() -> (String, usize) {
-    (concat!(
+pub fn not() -> String {
+    concat!(
         pop2m!("SP"),
         "M=!M \n",
         inc!("SP"),
-    ).to_string(), pop2m!() + 1 + inc!())
+    ).to_string()
 }
 
 
@@ -201,7 +195,6 @@ macro_rules! pop2s {
                       // 番地に保存する
         ), $index)
     };
-    () => { 6 + pop2d!() + 3 }
 }
 
 
@@ -225,7 +218,6 @@ macro_rules! pop2s_2 {
                       // 番地に保存する
         ), $index)
     };
-    () => { 6 + pop2d!() + 3 }
 }
 
 /// segment[index]をスタックの上にプッシュする
@@ -245,7 +237,6 @@ macro_rules! push2stack {
             inc!("SP"), // SPレジスタの値をインクリメントする
         ), $index)
     };
-    () => { 7 + inc!() }
 }
 
 /// pointer, temp向けのpop2s。
@@ -265,17 +256,16 @@ macro_rules! push2stack_2 {
             inc!("SP"), // SPレジスタの値をインクリメントする
         ), $index)
     };
-    () => { 7 + inc!() }
 }
 
 
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする
-pub fn push_constant(n: isize) -> (String, usize) {
+pub fn push_constant(n: isize) -> String {
     /*
     spレジスタの番地ではなく、spレジスタの値の番地にnを代入する
     */
-    (format!(
+    format!(
         concat!(
             "@{n} \n", // Aレジスタにnを入れる
             "D=A \n", // Dレジスタに移す
@@ -283,88 +273,88 @@ pub fn push_constant(n: isize) -> (String, usize) {
             "A=M \n", // SPレジスタの値をAレジスタに入れる
             "M=D \n", // SPレジスタの値の番地にnを入れる
             inc!("SP"), // SPレジスタの値をインクリメントする
-        ), n=n), 5 + inc!())
+        ), n=n)
 }
 
 /// segment[index]の値をスタック上にpushする
-pub fn push_local(index: isize) -> (String, usize) {
-    (push2stack!("LCL", index), push2stack!())
+pub fn push_local(index: isize) -> String {
+    push2stack!("LCL", index)
 }
 
 /// SPの番地の値をlocalが指す番地+indexの番地に書き込む
-pub fn pop_local(index: isize) -> (String, usize) {
-    (pop2s!("LCL", index), pop2s!())
+pub fn pop_local(index: isize) -> String {
+    pop2s!("LCL", index)
 }
 
 /// segment[index]の値をスタック上にpushする
-pub fn push_argument(index: isize) -> (String, usize) {
-    (push2stack!("ARG", index), push2stack!())
+pub fn push_argument(index: isize) -> String {
+    push2stack!("ARG", index)
 }
 
 /// SPの番地の値をargumentが指す番地+indexの番地に書き込む
-pub fn pop_argument(index: isize) -> (String, usize) {
-    (pop2s!("ARG", index), pop2s!())
+pub fn pop_argument(index: isize) -> String {
+    pop2s!("ARG", index)
 }
 
 /// segment[index]の値をスタック上にpushする
-pub fn push_this(index: isize) -> (String, usize) {
-    (push2stack!("THIS", index), push2stack!())
+pub fn push_this(index: isize) -> String {
+    push2stack!("THIS", index)
 }
 
 /// SPの番地の値をthisが指す番地+indexの番地に書き込む
-pub fn pop_this(index: isize) -> (String, usize) {
-    (pop2s!("THIS", index), pop2s!())
+pub fn pop_this(index: isize) -> String {
+    pop2s!("THIS", index)
 }
 
 /// segment[index]の値をスタック上にpushする
-pub fn push_that(index: isize) -> (String, usize) {
-    (push2stack!("THAT", index), push2stack!())
+pub fn push_that(index: isize) -> String {
+    push2stack!("THAT", index)
 }
 
 /// SPの番地の値をthatが指す番地+indexの番地に書き込む
-pub fn pop_that(index: isize) -> (String, usize) {
-    (pop2s!("THAT", index), pop2s!())
+pub fn pop_that(index: isize) -> String {
+    pop2s!("THAT", index)
 }
 
 /// segment[index]の値をスタック上にpushする
-pub fn push_temp(index: isize) -> (String, usize) {
-    (push2stack_2!("R5", index), push2stack_2!())
+pub fn push_temp(index: isize) -> String {
+    push2stack_2!("R5", index)
 }
 
 /// SPの番地の値をtempが指す番地+indexの番地に書き込む
-pub fn pop_temp(index: isize) -> (String, usize) {
-    (pop2s_2!("R5", index), pop2s_2!())
+pub fn pop_temp(index: isize) -> String {
+    pop2s_2!("R5", index)
 }
 
 /// segment[index]の値をスタック上にpushする。
 /// pointerはthisとthatの間にマッピングされる。
-pub fn push_pointer(index: isize) -> (String, usize) {
-    (push2stack_2!("THIS", index), push2stack_2!())
+pub fn push_pointer(index: isize) -> String {
+    push2stack_2!("THIS", index)
 }
 
 /// SPの番地の値をtempが指す番地+indexの番地に書き込む
 /// pointerはthisとthatの間にマッピングされる。
-pub fn pop_pointer(index: isize) -> (String, usize) {
-    (pop2s_2!("THIS", index), pop2s_2!())
+pub fn pop_pointer(index: isize) -> String {
+    pop2s_2!("THIS", index)
 }
 
-pub fn push_static(index: isize, filename: &str) -> (String, usize) {
-    (format!(concat!(
+pub fn push_static(index: isize, filename: &str) -> String {
+    format!(concat!(
         "@{}.{n} \n",
         "D=M \n",
         "@SP \n",
         "A=M \n", // SPレジスタの値をAレジスタに入れる
         "M=D \n", // SPレジスタの値の番地にnを入れる
         inc!("SP"), // SPレジスタの値をインクリメントする
-    ), filename, n=index), 5 + inc!())
+    ), filename, n=index)
 }
 
-pub fn pop_static(index: isize, filename: &str) -> (String, usize) {
-    (format!(concat!(
+pub fn pop_static(index: isize, filename: &str) -> String {
+    format!(concat!(
         pop2d!("SP"),
         "@{}.{n} \n",
         "M=D \n",
-    ), filename, n=index), pop2d!() + 2)
+    ), filename, n=index)
 }
 
 
@@ -386,7 +376,7 @@ mod test {
             "@SP \n",
             "M=M+1 \n", // SPレジスタの値をインクリメントする
         ).to_string();
-        assert_eq!(add(), (asm, 10));
+        assert_eq!(add(), asm);
     }
     
     #[test]
@@ -401,6 +391,6 @@ mod test {
             "@SP \n",
             "M=M+1 \n", // SPレジスタの値をインクリメントする
         ), n=n).to_string();
-        assert_eq!(push_constant(n), (asm, 7))
+        assert_eq!(push_constant(n), asm)
     }
 }
