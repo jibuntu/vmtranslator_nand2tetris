@@ -1,6 +1,7 @@
 #!/bin/bash
 # コマンドラインでcpuemulatorを使ったテストをする
 
+vmtranslator="./../target/debug/vmtranslator"
 emulator="./../../../../tools/CPUEmulator.sh"
 
 test() {
@@ -24,25 +25,39 @@ get_test_list() {
     result=()
 
     # pash変数の値が""なら配列には何も追加されない
-    ifarg "fibonacciseres" "../../ProgramFlow/FibonacciSeries/FibonacciSeries.tst"; result+=($path)
-    ifarg "basicloop" "../../ProgramFlow/BasicLoop/BasicLoop.tst"; result+=($path)
-    ifarg "if" "./if/test.tst"; result+=($path)
-    ifarg "goto" "./goto/test.tst"; result+=($path)
-    ifarg "push" "./push/test.tst"; result+=($path)
-    ifarg "pop" "./pop/test.tst"; result+=($path)
-    ifarg "lt" "./lt/lt.tst"; result+=($path)
-    ifarg "gt" "./gt/gt.tst"; result+=($path)
-    ifarg "eq" "./eq/eq/eq.tst"; result+=($path)
-    ifarg "eq_true" "./eq/true/true.tst"; result+=($path)
-    ifarg "eq_false" "./eq/false/false.tst"; result+=($path)
-    ifarg "eq_long" "./eq/long/long.tst"; result+=($path)
-    ifarg "add" "./add/add.tst"; result+=($path)
-    ifarg "sub" "./sub/sub.tst"; result+=($path)
+    # ".tst"は書かない
+    ifarg "fibonacciseres" "../../ProgramFlow/FibonacciSeries/FibonacciSeries"; result+=($path)
+    ifarg "basicloop" "../../ProgramFlow/BasicLoop/BasicLoop"; result+=($path)
+    ifarg "if" "./if/test"; result+=($path)
+    ifarg "goto" "./goto/test"; result+=($path)
+    ifarg "push" "./push/test"; result+=($path)
+    ifarg "pop" "./pop/test"; result+=($path)
+    ifarg "lt" "./lt/lt"; result+=($path)
+    ifarg "gt" "./gt/gt"; result+=($path)
+    ifarg "eq" "./eq/eq/eq"; result+=($path)
+    ifarg "eq_true" "./eq/true/true"; result+=($path)
+    ifarg "eq_false" "./eq/false/false"; result+=($path)
+    ifarg "eq_long" "./eq/long/long"; result+=($path)
+    ifarg "add" "./add/add"; result+=($path)
+    ifarg "sub" "./sub/sub"; result+=($path)
 }
 
+args=() # 引数のリスト
+compile="" # コンパイルするかどうか
 
+# 引数をパースする
+# -cオプションはコンパイルをする
 while [[ $1 != "" ]]; do
-    arg=$1
+    if [[ $1 == "-c" ]]; then
+        compile="true"
+    else
+        args+=($1)
+    fi
+    
+    shift 1
+done
+
+for arg in ${args[@]}; do
     shift 1
 
     result=()
@@ -54,8 +69,13 @@ while [[ $1 != "" ]]; do
     fi
     
     for path in ${result[@]}; do
+        if [[ $compile == "true" ]]; then
+            echo ""
+            echo $vmtranslator $path".vm" $path".asm"
+            $vmtranslator $path".vm" $path".asm"
+        fi
         printf $path" : "
-        test $path
+        test $path".tst"
     done
 done
 
