@@ -72,6 +72,17 @@ impl <W: Write> CodeWriter<W> {
         Ok(())
     }
 
+    /// if-gotoコマンドを行うアセンブリコードを書く
+    pub fn write_if_goto(&mut self, label: &str) -> Result<(), String> {
+        // 元のラベルをSymbolManagerを使って変換する
+        let label = self.sm.get_goto_symbol(label);
+
+        let asm = converter::if_goto(&label);
+        let _ = self.asm.write(asm.as_bytes());
+
+        Ok(())
+    }
+
     /// 与えられた算術コマンドをアセンブリコードに変換し、それを書き込む
     pub fn write_arithmetic(&mut self, command: &str) -> Result<(), String> {
         let asm = match command {

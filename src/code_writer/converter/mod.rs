@@ -167,6 +167,16 @@ pub fn not() -> String {
     ).to_string()
 }
 
+/// if-gotoコマンド。スタック最上位をpopし、その値が0以外なら
+/// ラベルで指定された場所へジャンプする
+pub fn if_goto(label: &str) -> String {
+    format!(concat!(
+        pop2d!("SP"), // スタックをpopしてDレジスタへ
+        "@{} \n", // ジャンプ先をAレジスタへ
+        "D;JNE \n", // Dレジスタが0以外ならジャンプ     
+    ), label)
+}
+
 
 /// スタックの一番上のデータをpopし、それをsegment[index]に格納する。
 /// * 第一引数はセグメントのレジスタ名
