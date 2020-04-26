@@ -4,12 +4,15 @@
 use std::io::Write;
 
 mod converter;
+mod symbol_manager;
+use symbol_manager::SymbolManager;
 
 /// VMコマンドをHackのアセンブリコードに変換する。
 /// `CommandType::{LAVEL, GOTO, IF, FUNCTION, RETURN, CALL}`に対応する部分は
 /// まだ実装しなくてよい
 pub struct CodeWriter<W> {
     filename: String,
+    sm: SymbolManager,
     rows: usize,
     asm: W
 }
@@ -19,6 +22,7 @@ impl <W: Write> CodeWriter<W> {
     pub fn new(stream: W) -> CodeWriter<W> {
         CodeWriter {
             filename: String::new(),
+            sm: SymbolManager::new(),
             rows: 0,
             asm: stream,
         }
@@ -74,9 +78,9 @@ impl <W: Write> CodeWriter<W> {
             "add" => converter::add(),
             "sub" => converter::sub(),
             "neg" => converter::neg(),
-            "eq" => converter::eq(self.rows),
-            "gt" => converter::gt(self.rows),
-            "lt" => converter::lt(self.rows),
+            "eq" => converter::eq(&self.sm.get_ifd_symbol()),
+            "gt" => converter::gt(&self.sm.get_ifd_symbol()),
+            "lt" => converter::lt(&self.sm.get_ifd_symbol()),
             "and" => converter::and(),
             "or" => converter::or(),
             "not" => converter::not(),

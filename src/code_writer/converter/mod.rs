@@ -71,20 +71,22 @@ macro_rules! binfunc {
 /// * 第二引数は条件
 /// * 第三引数のrowsは行数
 macro_rules! ifd {
-    ($var:expr, $jump:expr, $rows:expr) => {
+    ($var:expr, $jump:expr, $label:expr) => {
         format!(concat!(
-/* 01 */    "@{t_address} \n",  // 条件がtrueのときのジャンプ先を指定
-/* 02 */    "D;", $jump, " \n", // 条件がtrueならt_adressにジャンプする
-/* 03 */    "@0 \n",            // 条件がfalseの場合
-/* 04 */    "D=A \n",           // Dレジスタに0を入れる
-/* 05 */    "@{e_address} \n",  // e_addressをジャンプ先として指定
-/* 06 */    "0;JMP \n",         // 無条件でe_addressへジャンプする
-/* 07 */    "D=-1 \n",          // t_adressのジャンプ先、Dレジスタに-1を入れる
-/* 08 */    "@", $var, " \n",   // e_addressのジャンプ先
-/* 09 */    "A=M \n",
-/* 10 */    "M=D \n",           // $var変数にDレジスタの値を入れる
-            inc!($var)          // インクリメントする
-        ), t_address=($rows + 6), e_address=($rows + 7))
+            "@{t_label}-true \n",   // 条件がtrueのときのジャンプ先を指定
+            "D;", $jump, " \n",     // 条件がtrueならt_labelにジャンプする
+            "@0 \n",                // 条件がfalseの場合
+            "D=A \n",               // Dレジスタに0を入れる
+            "@{f_label}-false \n",  // f_labelをジャンプ先として指定
+            "0;JMP \n",             // 無条件でf_labelへジャンプする
+            "({t_label}-true) \n",   // t_labelのジャンプ先
+            "D=-1 \n",              // Dレジスタに-1を入れる
+            "({f_label}-false) \n", // f_labelのジャンプ先
+            "@", $var, " \n",
+            "A=M \n",
+            "M=D \n",               // $var変数にDレジスタの値を入れる
+            inc!($var)              // インクリメントする
+        ), t_label=$label, f_label=$label)
     };
     () => { 10 + inc!() };
 }
@@ -112,42 +114,42 @@ pub fn neg() -> (String, usize) {
 
 /// eqコマンドを変換する関数。引数は現在のアセンブリコードの行数。
 /// trueなら0、falseなら-1がスタックに入る
-pub fn eq(rows: usize) -> (String, usize) {
+pub fn eq(label: &str) -> (String, usize) {
     /*
     引き算をした結果のMが0かどうか
     */
     let mut asm = String::new();
     asm += binfunc!("SP", "-"); // 引き算をする
     asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
-    asm += &ifd!("SP", "JEQ", rows + binfunc!() + pop2d!());
+    asm += &ifd!("SP", "JEQ", label);
     
     (asm, binfunc!() + pop2d!() + ifd!())
 }
 
 /// gtコマンドを変換する関数。引数は現在のアセンブリコードの行数。
 /// trueなら0、falseなら-1がスタックに入る
-pub fn gt(rows: usize) -> (String, usize) {
+pub fn gt(label: &str) -> (String, usize) {
     let mut asm = String::new();
     /*
     引き算をした結果が0より大きければtrue
     */
     asm += binfunc!("SP", "-"); // 引き算をする
     asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
-    asm += &ifd!("SP", "JGT", rows + binfunc!() + pop2d!());
+    asm += &ifd!("SP", "JGT", label);
 
     (asm, binfunc!() + pop2d!() + ifd!())
 }
 
 /// ltコマンドを変換する関数。引数は現在のアセンブリコードの行数。
 /// trueなら0、falseなら-1がスタックに入る
-pub fn lt(rows: usize) -> (String, usize) {
+pub fn lt(label: &str) -> (String, usize) {
     let mut asm = String::new();
     /*
     引き算をした結果が0より小さければtrue
     */
     asm += binfunc!("SP", "-"); // 引き算をする
     asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
-    asm += &ifd!("SP", "JLT", rows + binfunc!() + pop2d!());
+    asm += &ifd!("SP", "JLT", label);
 
     (asm, binfunc!() + pop2d!() + ifd!())
 }
