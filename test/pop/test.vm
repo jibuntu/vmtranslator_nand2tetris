@@ -4,8 +4,4 @@ push constant 10
 pop local 3
 pop local 4
 
-push constant 100
-push constant 200
 
-pop temp 1
-pop temp 2
