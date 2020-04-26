@@ -1,0 +1,11 @@
+push constant 10
+
+if-goto end
+
+push constant 0
+
+if-goto end
+
+push constant 1
+
+label end

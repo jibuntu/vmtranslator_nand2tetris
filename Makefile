@@ -6,6 +6,9 @@ fibonacciseres:
 basicloop:
 	cargo run ../ProgramFlow/BasicLoop/BasicLoop.vm ../ProgramFlow/BasicLoop/BasicLoop.asm
 
+if:
+	cargo run ./test/if/test.vm ./test/if/test.asm
+
 goto:
 	cargo run ./test/goto/test.vm ./test/goto/test.asm
 
