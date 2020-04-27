@@ -90,6 +90,8 @@ impl <W: Write> CodeWriter<W> {
         let asm = converter::function(&funcname, argc);
         let _ = self.asm.write(asm.as_bytes());
 
+        self.sm.set_function_name(function);
+
         Ok(())
     }
 
