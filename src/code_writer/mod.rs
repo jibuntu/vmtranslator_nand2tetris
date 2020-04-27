@@ -68,7 +68,13 @@ impl <W: Write> CodeWriter<W> {
             "0;JMP \n"
         ), label);
 
-        let _ = self.asm.write(asm.as_bytes());
+        let asm_code = format!(concat!(
+            "// [start] goto {l}\n",
+            "{}",
+            "// [end] goto {l}\n"
+        ), asm, l=label);
+
+        let _ = self.asm.write(asm_code.as_bytes());
 
         Ok(())
     }
@@ -77,9 +83,15 @@ impl <W: Write> CodeWriter<W> {
     pub fn write_if_goto(&mut self, label: &str) -> Result<(), String> {
         // 元のラベルをSymbolManagerを使って変換する
         let label = self.sm.get_goto_symbol(label);
-
         let asm = converter::if_goto(&label);
-        let _ = self.asm.write(asm.as_bytes());
+
+        let asm_code = format!(concat!(
+            "// [start] if-goto {l}\n",
+            "{}",
+            "// [end] if-goto {l}\n"
+        ), asm, l=label);
+
+        let _ = self.asm.write(asm_code.as_bytes());
 
         Ok(())
     }
@@ -90,7 +102,13 @@ impl <W: Write> CodeWriter<W> {
     {
         let funcname = self.sm.get_function_symbol(function);
         let asm = converter::function(&funcname, argc);
-        let _ = self.asm.write(asm.as_bytes());
+
+        let asm_code = format!(concat!(
+            "// [start] function {f} {n}\n",
+            "{}",
+            "// [end] function {f} {n}\n"
+        ), asm, f=function, n=argc);
+        let _ = self.asm.write(asm_code.as_bytes());
 
         self.sm.set_function_name(function);
 
@@ -100,7 +118,14 @@ impl <W: Write> CodeWriter<W> {
     /// returnコマンドを行うアセンブリコードを書く
     pub fn write_return(&mut self) -> Result<(), String> {
         let asm = converter::ret();
-        let _ = self.asm.write(asm.as_bytes());
+
+        let asm_code = format!(concat!(
+            "// [start] return\n",
+            "{}",
+            "// [end] return\n"
+        ), asm);
+
+        let _ = self.asm.write(asm_code.as_bytes());
 
         Ok(())
     }
