@@ -83,8 +83,12 @@ for arg in ${args[@]}; do
     
     for path in ${result[@]}; do
         if [[ $compile == "true" ]]; then
+            # コンパイルするときは.vmファイルではなく.vmファイルが入っているディレクトリをコンパイル対象にする
+            # したがって、$pathが"./test/vmtest"だったら"./test"がコンパイルする対象になる
+            # コンパイル後のファイル名は$path".asm"にする
             printf "[cmpiled] "
-            $vmtranslator $path".vm" $path".asm"
+            vm_path=$(echo $path | sed -e "s/[^/]*$//") # ファイル名の部分を取り除く
+            $vmtranslator $vm_path $path".asm"
         fi
         printf $path" : "
         printf "\x1b[31m" # 文字を赤色にする
