@@ -3,6 +3,7 @@
 //! R13~R15までのアドレスの使用方法
 //! * R13 pop2d!マクロ内で使われる
 //! * R14 returnコマンドのLCLの値を一時保存するために使われる
+//! * R15 returnコマンドのreturn addressを一時保存するために使われる
 
 #![allow(dead_code)]
 use std::io::Write;

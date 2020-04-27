@@ -324,12 +324,23 @@ pub fn ret() -> String {
     asm += "D=M \n"; // M[LCL]の値をDレジスタへ
     asm += "@R14 \n";
     asm += "M=D \n"; // M[LCL]の値をR14レジスタへ
+
+    // return addressの値をR15レジスタへ
+    // return addressはM[M[LCL]-5]の値
+    asm += "@R14 \n";
+    asm += "D=M \n";   // D=M[LCL]
+    asm += "@5 \n";
+    asm += "A=D-A \n"; // A=M[LCL]-5
+    asm += "D=M \n";   // D=M[M[LCL]-5]
+    asm += "@R15 \n";
+    asm += "M=D \n";   // M[R15]=M[M[LCL]-5]
+
     
     // ARG[0]の番地にスタックの先頭を値を入れる
     asm += pop2d!("SP"); // スタックの先頭の値をDレジスタへ
     asm += "@ARG \n";
-    asm += "A=M \n";
-    asm += "M=D \n"; // ARGセグメントの値の番地へDを入れる
+    asm += "A=M \n"; // M[ARG]
+    asm += "M=D \n"; // M[M[ARG]]へDを入れる
     
     // SPの値を呼び出し側の値に戻す
     // ARG[0]の番地の戻り値が入っているので、ARG[0]の番地+1をSPの値にする
@@ -346,8 +357,8 @@ pub fn ret() -> String {
         // segmentの値をM[M[R14]-1]にする
         asm += "@R14 \n";
         asm += "M=M-1 \n"; // R14をデクリメント
-        asm += "A=M \n";      // M[R14]-1をAレジスタへ
-        asm += "D=M \n"; // M[M[R14]-1]をDレジスタへ
+        asm += "A=M \n";   // M[R14]-1をAレジスタへ
+        asm += "D=M \n";   // M[M[R14]-1]をDレジスタへ
         asm += "@";
         asm += segment;
         asm += " \n";
@@ -355,13 +366,9 @@ pub fn ret() -> String {
     }
 
     // return addressへジャンプする
-    // return addressは*LCL-5の番地に入っている
-    // すでにその値はR14に代入済み
-    // また、すでにR14の値を4回デクリメントしているのでもう一度デクリメント
-    // すれば*LCL-5の値になる
-    asm += "@R14 \n";
-    asm += "M=M-1 \n"; // R14をデクリメント
-    asm += "A=M \n"; // M[R14]に入ってるreturn addressをAレジスタに入れる
+    // return addressはR15の番地に入っている
+    asm += "@R15 \n";
+    asm += "A=M \n"; // A=M[R15]
     asm += "0;JMP \n"; // return addressへジャンプ
 
     asm
