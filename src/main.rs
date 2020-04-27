@@ -57,10 +57,12 @@ fn vm_to_asm<R, W>(p: &mut Parser<R>, cw: &mut CodeWriter<W>)
                                   p.arg2().unwrap() as usize)?
             },
             CommandType::RETURN => cw.write_return()?,
+            CommandType::CALL => {
+                cw.write_call(&p.arg1().unwrap(),
+                              p.arg2().unwrap() as usize)?
+            },
             CommandType::None => return Err(format!("{} は無効なコマンドです",
                                                     p.arg1().unwrap())),
-            _ => return Err(format!("{:?} は未実装のコマンドです", 
-                                    p.command_type()))
         }
     }
     Ok(())
@@ -120,6 +122,7 @@ fn main() {
 
     let mut code_writer = CodeWriter::new(outputfile);
     code_writer.write_init();
+    let _ = code_writer.write_call("Sys.init", 0);
     
     for filename in f_list {
         let file = match File::open(&filename) {

@@ -282,6 +282,70 @@ pub fn if_goto(label: &str) -> String {
     ), label)
 }
 
+/// callコマンド
+pub fn call(funcname: &str, argc: usize, return_address: &str) -> String {
+    /*
+    callコマンドが呼ばれる前に引数はスタックにpushされている
+    return addressをスタックにpushする
+    呼び出し側のLCLからTHATまでの値をスタックにpushしておく
+    ARGとLCLは呼び出される関数が使うので値を設定しておく
+    関数に移るジャンプ命令を書く
+    ラベルを宣言する
+    */
+    let mut asm = String::new();
+
+    // return addressをpushする
+    asm += &format!(concat!(
+        "@{} \n",   // return addressをAレジスタへ
+        "D=A \n",   // return addressをDレジスタへ
+        d2stack!(), // Dレジスタの値(return address)をスタックへ
+    ), return_address);
+
+    // 呼び出し側のセグメントのアドレスをスタックへpush
+    for segment in &["LCL", "ARG", "THIS", "THAT"] {
+        asm += &format!(concat!(
+            "@{} \n",
+            "D=M \n",   // M[segment]の値をDレジスタへ
+            d2stack!(), // Dレジスタの値をstackへpush
+        ), segment);
+    }
+
+    // ARGセグメントの値を設定する
+    // 現在のSPの値 - argc - 5
+    // M[ARG] = M[SP]-argc-5
+    asm += &format!(concat!(
+        "@SP \n",
+        "D=M \n",   // M[SP]の値をDレジスタへ
+        "@{} \n",   // argcをAレジスタへ
+        "D=D-A \n", // M[SP]-argc
+        "@5 \n",    // 5をAレジスタへ
+        "D=D-A \n", // M[SP]-argc-5
+        "@ARG \n",
+        "M=D \n",   // M[ARG] = M[SP]-argc-5
+    ), argc);
+
+    // LCLセグメントの値を設定する
+    // LCLセグメントは先頭なのでSPレジスタの値を入れればいい
+    asm += concat!(
+        "@SP \n",
+        "D=M \n", // SPレジスタの値をDレジスタへ
+        "@LCL \n",
+        "M=D \n", // M[LCL]=M[SP]
+    );
+
+    // 関数を呼び出す前の準備が済んだのでジャンプする
+    // 関数のアドレスをAレジスタに入れてジャンプする
+    asm += &format!(concat!(
+        "@{} \n",
+        "0;JMP \n"
+    ), funcname);
+
+    // return addressのラベルを宣言する
+    asm += &format!("({}) \n", return_address);
+
+    asm
+}
+
 /// functionコマンド。
 pub fn function(funcname: &str, argc: usize) -> String {
     let mut asm = String::new();

@@ -97,6 +97,25 @@ impl <W: Write> CodeWriter<W> {
         Ok(())
     }
 
+   /// callコマンドを行うアセンブリコードを書く
+   pub fn write_call(&mut self, function: &str, argc: usize) -> Result<(), String> {
+       // 関数名を取得
+       let funcname = self.sm.get_function_symbol(function);
+       // return addressのラベルを取得
+       let return_address = self.sm.get_return_address_symbol(function);
+       let asm = converter::call(&funcname, argc, &return_address);
+
+       let asm_code = format!(concat!(
+           "// [start] call {f} {n}\n",
+           "{}",
+           "// [end] call {f} {n}\n"
+       ), asm, f=function, n=argc);
+
+       let _ = self.asm.write(asm_code.as_bytes());
+
+       Ok(())
+   }
+
     /// functinoコマンドを行うアセンブリコードを書く
     pub fn write_function(&mut self, function: &str, argc: usize) 
         -> Result<(), String> 

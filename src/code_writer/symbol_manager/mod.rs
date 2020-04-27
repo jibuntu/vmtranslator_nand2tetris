@@ -4,7 +4,8 @@
 pub struct SymbolManager {
     file_name: String,
     function_name: String,
-    ifd_count: usize
+    ifd_count: usize,
+    ra_count: usize, // return address count
 }
 
 impl SymbolManager {
@@ -12,7 +13,8 @@ impl SymbolManager {
         SymbolManager {
             file_name: String::new(),
             function_name: String::new(),
-            ifd_count: 0
+            ifd_count: 0,
+            ra_count: 0, 
         }
     }
 
@@ -23,6 +25,13 @@ impl SymbolManager {
     /// functionコマンドで使うsymbolを取得する
     pub fn get_function_symbol(&mut self, function: &str) -> String {
         format!("symbol-function-{}", function)
+    }
+
+    /// callコマンドで使うreturn addressのシンボルを取得する
+    pub fn get_return_address_symbol(&mut self, func: &str) -> String {
+        let s = format!("symbol-return-address-{}-{}", func, self.ra_count);
+        self.ra_count += 1;
+        s
     }
 
     /// converterモジュールのifdマクロで使うsymbolを取得する
