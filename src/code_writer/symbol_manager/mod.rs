@@ -16,6 +16,10 @@ impl SymbolManager {
         }
     }
 
+    pub fn set_function_name(&mut self, function: &str) {
+        self.function_name = function.to_string();
+    }
+
     /// functionコマンドで使うsymbolを取得する
     pub fn get_function_symbol(&mut self, functoin: &str) -> String {
         format!("symbol-function-{}", functoin)
@@ -30,7 +34,7 @@ impl SymbolManager {
 
     /// gotoのときに使うラベルを取得する
     pub fn get_goto_symbol(&self, label: &str) -> String {
-        format!("symbol-goto-{}", label)
+        format!("symbol-goto-{}-{}", self.function_name, label)
     }
 }
 
