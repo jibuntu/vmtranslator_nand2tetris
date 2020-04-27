@@ -21,8 +21,8 @@ impl SymbolManager {
     }
 
     /// functionコマンドで使うsymbolを取得する
-    pub fn get_function_symbol(&mut self, functoin: &str) -> String {
-        format!("symbol-function-{}", functoin)
+    pub fn get_function_symbol(&mut self, function: &str) -> String {
+        format!("symbol-function-{}", function)
     }
 
     /// converterモジュールのifdマクロで使うsymbolを取得する
