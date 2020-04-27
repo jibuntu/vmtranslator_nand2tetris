@@ -15,14 +15,18 @@ fn print_usage() {
     println!("VMコマンドをHackアセンブリコードへ変換する");
     println!();
     println!("Usage:");
-    println!("   command vm_path asm_path");
+    println!("   command vm_path asm_path [options]");
     println!();
     println!("Arguments:");
     println!("    vm_path     vmファイル、もしくはvmファイルのあるディレクトリのパス。");
     println!("                vm_pathがディレクトリのパスの場合はディレクトリ内にあるすべての");
     println!("                vmファイルを１つのasmファイルに変換する");
     println!("    asm_path    コンパイルされたasmファイルを書き込むパス");
-
+    println!();
+    println!("Options:");
+    println!("    -w, --without-sys-init    通常はアセンブリファイルの最初にSys.init関数を");
+    println!("                              実行するコードを書くが、このオプションがあるときは");
+    println!("                              そのコードを書かない。");
 }
 
 fn print_error(e: &str) {
@@ -100,21 +104,30 @@ fn get_f_list(vm_path: &str) -> Result<Vec<String>, String> {
 }
 
 fn main() {
-    let mut args = env::args().skip(1);
-    let vm_path = match args.next() {
+    let mut args = Vec::new();
+    let mut options = Vec::new();
+
+    for arg in env::args().skip(1) {
+        match arg.as_str() {
+            "-w" | "--without-sys-init" => options.push("--without-sys-init"),
+            _ => args.push(arg),
+        }
+    }
+
+    let vm_path = match args.get(0) {
         Some(f) => f,
         None => return print_error("vm_pathがありません")
     };
-    let asm_path = match args.next() {
+    let asm_path = match args.get(1) {
         Some(f) => f,
         None => return print_error("asm_pathがありません")
     };
 
-    let f_list = match get_f_list(&vm_path) {
+    let f_list = match get_f_list(vm_path) {
         Ok(f_list) => f_list,
         Err(e) => return print_error(&e)
     };
-    let outputfile = match File::create(&asm_path) {
+    let outputfile = match File::create(asm_path) {
         Ok(f) => f,
         Err(_) => return print_error(&format!("can't create '{}'.", 
                                               asm_path))
@@ -122,7 +135,10 @@ fn main() {
 
     let mut code_writer = CodeWriter::new(outputfile);
     code_writer.write_init();
-    let _ = code_writer.write_call("Sys.init", 0);
+
+    if options.contains(&"--without-sys-init") == false {
+        let _ = code_writer.write_call("Sys.init", 0);
+    }
     
     for filename in f_list {
         let file = match File::open(&filename) {
