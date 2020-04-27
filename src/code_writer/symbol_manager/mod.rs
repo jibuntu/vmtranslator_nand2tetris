@@ -16,6 +16,11 @@ impl SymbolManager {
         }
     }
 
+    /// functionコマンドで使うsymbolを取得する
+    pub fn get_function_symbol(&mut self, functoin: &str) -> String {
+        format!("symbol-function-{}", functoin)
+    }
+
     /// converterモジュールのifdマクロで使うsymbolを取得する
     pub fn get_ifd_symbol(&mut self) -> String {
         let s = format!("symbol-ifd-{}", self.ifd_count);
