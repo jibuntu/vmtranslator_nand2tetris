@@ -167,16 +167,6 @@ pub fn not() -> String {
     ).to_string()
 }
 
-/// if-gotoコマンド。スタック最上位をpopし、その値が0以外なら
-/// ラベルで指定された場所へジャンプする
-pub fn if_goto(label: &str) -> String {
-    format!(concat!(
-        pop2d!("SP"), // スタックをpopしてDレジスタへ
-        "@{} \n", // ジャンプ先をAレジスタへ
-        "D;JNE \n", // Dレジスタが0以外ならジャンプ     
-    ), label)
-}
-
 
 /// スタックの一番上のデータをpopし、それをsegment[index]に格納する。
 /// * 第一引数はセグメントのレジスタ名
@@ -268,6 +258,102 @@ macro_rules! push2stack_2 {
     };
 }
 
+
+
+/// if-gotoコマンド。スタック最上位をpopし、その値が0以外なら
+/// ラベルで指定された場所へジャンプする
+pub fn if_goto(label: &str) -> String {
+    format!(concat!(
+        pop2d!("SP"), // スタックをpopしてDレジスタへ
+        "@{} \n", // ジャンプ先をAレジスタへ
+        "D;JNE \n", // Dレジスタが0以外ならジャンプ     
+    ), label)
+}
+
+/// functionコマンド。
+pub fn function(funcname: &str, argc: usize) -> String {
+    let mut asm = String::new();
+    
+    // 関数のラベルを設定
+    asm += &format!("({}) \n", funcname);
+
+    /*
+    argc個のローカル変数を0で初期化する
+    ローカル変数はスタックに積まれているので、0をスタックにpushすればいい
+    また、関数の開始時にはローカル変数の次のアドレスをSPが指している必要がある
+    */
+    for _i in 0..argc {
+        asm += concat!(
+                "@0 \n", // Aレジスタに0を入れる
+                "D=A \n", // Dレジスタに移す
+                "@SP \n",
+                "A=M \n", // SPレジスタの値をAレジスタに入れる
+                "M=D \n", // SPレジスタの値の番地に0を入れる
+                inc!("SP"), // SPレジスタの値をインクリメントする
+            );
+    }
+
+    asm
+}
+
+/// returnコマンド
+pub fn ret() -> String {
+    /*
+    return addressにジャンプする前に返り値(スタックの先頭の値)を
+    ARG[0]の場所に置いておく
+    LCLの前に呼び出し側のセグメント情報があるので、
+    LCLの値の番地-iでアクセスする
+    各セグメントを呼び出し側の値に戻す
+    */
+    let mut asm = String::new();
+
+    // LCLが持つ番地の値をR14レジスタへ
+    asm += "@LCL \n";
+    asm += "D=M \n"; // M[LCL]の値をDレジスタへ
+    asm += "@R14 \n";
+    asm += "M=D \n"; // M[LCL]の値をR14レジスタへ
+    
+    // ARG[0]の番地にスタックの先頭を値を入れる
+    asm += pop2d!("SP"); // スタックの先頭の値をDレジスタへ
+    asm += "@ARG \n";
+    asm += "A=M \n";
+    asm += "M=D \n"; // ARGセグメントの値の番地へDを入れる
+    
+    // SPの値を呼び出し側の値に戻す
+    // ARG[0]の番地の戻り値が入っているので、ARG[0]の番地+1をSPの値にする
+    // SPの値をM[ARG[0]]+1の値にする
+    asm += "@ARG \n"; // ARGのレジスタには最初の引数のアドレスが入っている
+    asm += "D=M \n"; // M[ARG[0]]の値をDレジスタへ
+    asm += "D=D+1 \n"; // Dレジスタの値をインクリメントする D=M[ARG[0]]+1
+    asm += "@SP \n";
+    asm += "M=D \n"; // SPレジスタの値にM[ARG[0]]+1を入れる
+
+    // THATからLCLのセグメントの値を呼び出し側の値に戻す
+    // R14の値をデクリメントしながら各セグメントへ値を入れる
+    for segment in &["THAT", "THIS", "ARG", "LCL"] {
+        // segmentの値をM[M[R14]-1]にする
+        asm += "@R14 \n";
+        asm += "M=M-1 \n"; // R14をデクリメント
+        asm += "A=M \n";      // M[R14]-1をAレジスタへ
+        asm += "D=M \n"; // M[M[R14]-1]をDレジスタへ
+        asm += "@";
+        asm += segment;
+        asm += " \n";
+        asm += "M=D \n";   // M[M[R14]-1]をsegmentレジスタへ
+    }
+
+    // return addressへジャンプする
+    // return addressは*LCL-5の番地に入っている
+    // すでにその値はR14に代入済み
+    // また、すでにR14の値を4回デクリメントしているのでもう一度デクリメント
+    // すれば*LCL-5の値になる
+    asm += "@R14 \n";
+    asm += "M=M-1 \n"; // R14をデクリメント
+    asm += "A=M \n"; // M[R14]に入ってるreturn addressをAレジスタに入れる
+    asm += "0;JMP \n"; // return addressへジャンプ
+
+    asm
+}
 
 
 /// SPが指す番地に定数(n)を代入してSPをインクリメントする

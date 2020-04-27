@@ -1,5 +1,9 @@
 // APIの仕様については nand2tetris - page 160
 
+//! R13~R15までのアドレスの使用方法
+//! * R13 pop2d!マクロ内で使われる
+//! * R14 returnコマンドのLCLの値を一時保存するために使われる
+
 #![allow(dead_code)]
 use std::io::Write;
 
@@ -40,7 +44,6 @@ impl <W: Write> CodeWriter<W> {
             "D=A \n",
             "@SP \n",
             "M=D \n",
-
         ));
 
         let _ = self.asm.write(asm.as_bytes());
@@ -48,10 +51,6 @@ impl <W: Write> CodeWriter<W> {
 
     /// labelコマンドを行うアセンブリコードを書く
     pub fn write_label(&mut self, label: &str) -> Result<(), String> {
-        /*
-        labelが定義された関数内のみで有効ということはファイル名と関数名を先頭に
-        つける必要があるかもしれない
-        */
         // labelが被らないようにSymbolManagerを使う
         let label = self.sm.get_goto_symbol(label);
         let _ = self.asm.write(format!("({}) \n", label).as_bytes());
@@ -78,6 +77,25 @@ impl <W: Write> CodeWriter<W> {
         let label = self.sm.get_goto_symbol(label);
 
         let asm = converter::if_goto(&label);
+        let _ = self.asm.write(asm.as_bytes());
+
+        Ok(())
+    }
+
+    /// functinoコマンドを行うアセンブリコードを書く
+    pub fn write_function(&mut self, function: &str, argc: usize) 
+        -> Result<(), String> 
+    {
+        let funcname = self.sm.get_function_symbol(function);
+        let asm = converter::function(&funcname, argc);
+        let _ = self.asm.write(asm.as_bytes());
+
+        Ok(())
+    }
+
+    /// returnコマンドを行うアセンブリコードを書く
+    pub fn write_return(&mut self) -> Result<(), String> {
+        let asm = converter::ret();
         let _ = self.asm.write(asm.as_bytes());
 
         Ok(())

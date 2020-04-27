@@ -41,6 +41,11 @@ fn vm_to_asm<R, W>(p: &mut Parser<R>, cw: &mut CodeWriter<W>)
             CommandType::LABEL => cw.write_label(&p.arg1().unwrap())?,
             CommandType::GOTO => cw.write_goto(&p.arg1().unwrap())?,
             CommandType::IF => cw.write_if_goto(&p.arg1().unwrap())?,
+            CommandType::FUNCTION => {
+                cw.write_function(&p.arg1().unwrap(),
+                                  p.arg2().unwrap() as usize)?
+            },
+            CommandType::RETURN => cw.write_return()?,
             CommandType::None => return Err(format!("{} は無効なコマンドです",
                                                     p.arg1().unwrap())),
             _ => return Err(format!("{:?} は未実装のコマンドです", 
