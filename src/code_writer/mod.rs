@@ -33,6 +33,8 @@ impl <W: Write> CodeWriter<W> {
     /// CodeWriterモジュールに新しいVMファイルの変換が開始したことを知らせる
     pub fn set_file_name(&mut self, filename: &str) {
         self.filename = filename.to_string();
+        let asm = format!("// [file] {} \n", filename);
+        let _ = self.asm.write(asm.as_bytes());
     }
 
     /// VMの初期化（これは「ブートストラップ」と呼ばれる）
