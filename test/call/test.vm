@@ -1,0 +1,20 @@
+//function add5_10 2 // 5+10の結果を返す関数
+//    push constant 5
+//    push constant 10
+//    add
+//    return
+
+function second 0
+    return
+
+function main 0
+    call second 0
+    return
+
+function Sys.init 0
+    call main 0
+
+    label TEST
+    goto TEST
+    return
+

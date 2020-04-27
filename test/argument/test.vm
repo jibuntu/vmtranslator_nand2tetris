@@ -1,0 +1,35 @@
+//function add5_10 2 // 5+10の結果を返す関数
+//    push constant 5
+//    push constant 10
+//    add
+//    return
+
+function second 1
+    push argument 0
+    pop local 0
+    
+    return
+
+function main 2
+    push argument 0
+    pop local 0
+    push constant 20
+    pop local 1
+    sub
+    
+    call second 1
+
+    return
+
+function Sys.init 0
+    push constant 19
+    call main 1
+
+    if-goto LOOP
+
+    label TEST
+    goto TEST
+    return
+
+label LOOP
+goto LOOP
