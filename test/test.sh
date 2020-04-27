@@ -26,6 +26,8 @@ get_test_list() {
 
     # pash変数の値が""なら配列には何も追加されない
     # ".tst"は書かない
+    ifarg "staticstest" "../../FunctionCalls/StaticsTest/StaticsTest"; result+=($path)
+    ifarg "nestedcall" "../../FunctionCalls/NestedCall/NestedCall"; result+=($path)
     ifarg "fibonaccielement" "../../FunctionCalls/FibonacciElement/FibonacciElement"; result+=($path)
     ifarg "simplefunction" "../../FunctionCalls/SimpleFunction/SimpleFunction"; result+=($path)
     ifarg "fibonacciseres" "../../ProgramFlow/FibonacciSeries/FibonacciSeries"; result+=($path)
