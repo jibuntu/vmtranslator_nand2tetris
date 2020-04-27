@@ -347,18 +347,18 @@ pub fn call(funcname: &str, argc: usize, return_address: &str) -> String {
 }
 
 /// functionコマンド。
-pub fn function(funcname: &str, argc: usize) -> String {
+pub fn function(funcname: &str, number: usize) -> String {
     let mut asm = String::new();
     
     // 関数のラベルを設定
     asm += &format!("({}) \n", funcname);
 
     /*
-    argc個のローカル変数を0で初期化する
+    number個のローカル変数を0で初期化する
     ローカル変数はスタックに積まれているので、0をスタックにpushすればいい
     また、関数の開始時にはローカル変数の次のアドレスをSPが指している必要がある
     */
-    for _i in 0..argc {
+    for _i in 0..number {
         asm += concat!(
                 "@0 \n", // Aレジスタに0を入れる
                 "D=A \n", // Dレジスタに移す

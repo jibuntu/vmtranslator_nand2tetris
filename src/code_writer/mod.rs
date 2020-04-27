@@ -117,17 +117,17 @@ impl <W: Write> CodeWriter<W> {
    }
 
     /// functinoコマンドを行うアセンブリコードを書く
-    pub fn write_function(&mut self, function: &str, argc: usize) 
+    pub fn write_function(&mut self, function: &str, number: usize) 
         -> Result<(), String> 
     {
         let funcname = self.sm.get_function_symbol(function);
-        let asm = converter::function(&funcname, argc);
+        let asm = converter::function(&funcname, number);
 
         let asm_code = format!(concat!(
             "// [start] function {f} {n}\n",
             "{}",
             "// [end] function {f} {n}\n"
-        ), asm, f=function, n=argc);
+        ), asm, f=function, n=number);
         let _ = self.asm.write(asm_code.as_bytes());
 
         self.sm.set_function_name(function);
