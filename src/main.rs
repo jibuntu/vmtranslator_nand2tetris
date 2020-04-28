@@ -146,8 +146,10 @@ fn main() {
             Err(_) => return print_error(&format!("{}を開けません", &filename))
         };
         
-        let mut parser = Parser::new(file);
-        code_writer.set_file_name(filename.split('/').rev().nth(1).unwrap());
+        let mut parser = Parser::new(file); 
+        let mut fname = filename.split('/').last().unwrap();
+        fname = fname.trim_end_matches(".vm"); // 拡張子を削除
+        code_writer.set_file_name(fname);
         if let Err(e) = vm_to_asm(&mut parser, &mut code_writer) {
             return print_error(&e);
         }
