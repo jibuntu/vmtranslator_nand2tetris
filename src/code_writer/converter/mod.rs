@@ -29,7 +29,7 @@ macro_rules! pop2d {
         concat!(
             dec!($var), // $varレジスタの値をデクリメント
             "A=M \n",
-            "D=M \n" // Dレジスタに数値を入れる
+            "D=M \n"    // Dレジスタに数値を入れる
         )
     };
 }
@@ -51,10 +51,10 @@ macro_rules! pop2m {
 macro_rules! binfunc {
     ($var:expr, $sign:expr) => {
         concat!(
-            pop2d!($var), // SPレジスタの値をDレジスタに入れる
-            pop2m!($var), // SPレジスタの値をMレジスタに入れる
+            pop2d!($var),             // SPレジスタの値をDレジスタに入れる
+            pop2m!($var),             // SPレジスタの値をMレジスタに入れる
             "M=M", $sign, "D", " \n", // M[SP] = M[SP] $sign M[SP+1]
-            inc!($var) // SPレジスタの値をインクリメントする
+            inc!($var)                // SPレジスタの値をインクリメントする
         )
     };
 }
@@ -74,7 +74,7 @@ macro_rules! ifd {
             "D=A \n",               // Dレジスタに0を入れる
             "@{f_label}-false \n",  // f_labelをジャンプ先として指定
             "0;JMP \n",             // 無条件でf_labelへジャンプする
-            "({t_label}-true) \n",   // t_labelのジャンプ先
+            "({t_label}-true) \n",  // t_labelのジャンプ先
             "D=-1 \n",              // Dレジスタに-1を入れる
             "({f_label}-false) \n", // f_labelのジャンプ先
             "@", $var, " \n",
@@ -114,7 +114,7 @@ pub fn eq(label: &str) -> String {
     */
     let mut asm = String::new();
     asm += binfunc!("SP", "-"); // 引き算をする
-    asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
+    asm += pop2d!("SP");        // 引き算の結果をDレジスタに入れる
     asm += &ifd!("SP", "JEQ", label);
     
     asm
@@ -128,7 +128,7 @@ pub fn gt(label: &str) -> String {
     引き算をした結果が0より大きければtrue
     */
     asm += binfunc!("SP", "-"); // 引き算をする
-    asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
+    asm += pop2d!("SP");        // 引き算の結果をDレジスタに入れる
     asm += &ifd!("SP", "JGT", label);
 
     asm
@@ -142,7 +142,7 @@ pub fn lt(label: &str) -> String {
     引き算をした結果が0より小さければtrue
     */
     asm += binfunc!("SP", "-"); // 引き算をする
-    asm += pop2d!("SP"); // 引き算の結果をDレジスタに入れる
+    asm += pop2d!("SP");        // 引き算の結果をDレジスタに入れる
     asm += &ifd!("SP", "JLT", label);
 
     asm
@@ -194,17 +194,17 @@ macro_rules! pop2s {
             MレジスタにDレジスタの値を入れる
             */
             "@", $segment," \n", 
-            "D=M \n", // segmentレジスタの値をDレジスタへ
-            "@{} \n", // indexの値をAレジスタへ
+            "D=M \n",   // segmentレジスタの値をDレジスタへ
+            "@{} \n",   // indexの値をAレジスタへ
             "D=D+A \n", // D+Aを計算して出てきた番地をDレジスタに入れる
             "@R13 \n",
-            "M=D \n", // R13にDレジスタに入っている計算結果を保存する
+            "M=D \n",   // R13にDレジスタに入っている計算結果を保存する
             
             pop2d!("SP"), // SPをポップしてDレジスタに入れる
             "@R13 \n",
-            "A=M \n", // R13レジスタの値(segment+indexの計算結果)をAレジスタへ
-            "M=D \n", // スタックからpopしたレジスタをsegment+indexの計算結果の
-                      // 番地に保存する
+            "A=M \n",     // R13レジスタの値(segment+indexの計算結果)をAレジスタへ
+            "M=D \n",     // スタックからpopしたレジスタをsegment+indexの計算結果の
+                          // 番地に保存する
         ), $index)
     };
 }
@@ -217,17 +217,17 @@ macro_rules! pop2s_2 {
     ($segment:expr, $index:ident) => {
         format!(concat!(
             "@", $segment," \n", 
-            "D=A \n", // segmentレジスタの番地をDレジスタへ
-            "@{} \n", // indexの値をAレジスタへ
+            "D=A \n",   // segmentレジスタの番地をDレジスタへ
+            "@{} \n",   // indexの値をAレジスタへ
             "D=D+A \n", // D+Aを計算して出てきた番地をDレジスタに入れる
             "@R13 \n",
-            "M=D \n", // R13にDレジスタに入っている計算結果を保存する
+            "M=D \n",   // R13にDレジスタに入っている計算結果を保存する
             
             pop2d!("SP"), // SPをポップしてDレジスタに入れる
             "@R13 \n",
-            "A=M \n", // R13レジスタの値(segment+indexの計算結果)をAレジスタへ
-            "M=D \n", // スタックからpopしたレジスタをsegment+indexの計算結果の
-                      // 番地に保存する
+            "A=M \n",     // R13レジスタの値(segment+indexの計算結果)をAレジスタへ
+            "M=D \n",     // スタックからpopしたレジスタをsegment+indexの計算結果の
+                          // 番地に保存する
         ), $index)
     };
 }
@@ -239,13 +239,13 @@ macro_rules! push2stack {
     ($segment:expr, $index:ident) => {
         format!(concat!(
             "@", $segment, " \n",
-            "D=M \n", // segmentレジスタの値をDレジスタへ
-            "@{} \n", // indexの値をAレジスタへ
+            "D=M \n",   // segmentレジスタの値をDレジスタへ
+            "@{} \n",   // indexの値をAレジスタへ
             "A=D+A \n", // segmentレジスタの値とindexの値を足してAレジスタへ
-            "D=M \n", // segment[index]の値をDレジスタへ
+            "D=M \n",   // segment[index]の値をDレジスタへ
             "@SP \n",
-            "A=M \n", // M[SP]の値をAアドレスへ
-            "M=D \n", // スタックの先頭にsegment[index]の値を入れる
+            "A=M \n",   // M[SP]の値をAアドレスへ
+            "M=D \n",   // スタックの先頭にsegment[index]の値を入れる
             inc!("SP"), // SPレジスタの値をインクリメントする
         ), $index)
     };
@@ -258,13 +258,13 @@ macro_rules! push2stack_2 {
     ($segment:expr, $index:ident) => {
         format!(concat!(
             "@", $segment, " \n",
-            "D=A \n", // segmentレジスタの番地をDレジスタへ
-            "@{} \n", // indexの値をAレジスタへ
+            "D=A \n",   // segmentレジスタの番地をDレジスタへ
+            "@{} \n",   // indexの値をAレジスタへ
             "A=D+A \n", // segmentレジスタの値とindexの値を足してAレジスタへ
-            "D=M \n", // segment[index]の値をDレジスタへ
+            "D=M \n",   // segment[index]の値をDレジスタへ
             "@SP \n",
-            "A=M \n", // M[SP]の値をAアドレスへ
-            "M=D \n", // スタックの先頭にsegment[index]の値を入れる
+            "A=M \n",   // M[SP]の値をAアドレスへ
+            "M=D \n",   // スタックの先頭にsegment[index]の値を入れる
             inc!("SP"), // SPレジスタの値をインクリメントする
         ), $index)
     };
@@ -277,8 +277,8 @@ macro_rules! push2stack_2 {
 pub fn if_goto(label: &str) -> String {
     format!(concat!(
         pop2d!("SP"), // スタックをpopしてDレジスタへ
-        "@{} \n", // ジャンプ先をAレジスタへ
-        "D;JNE \n", // Dレジスタが0以外ならジャンプ     
+        "@{} \n",     // ジャンプ先をAレジスタへ
+        "D;JNE \n",   // Dレジスタが0以外ならジャンプ     
     ), label)
 }
 
@@ -360,11 +360,11 @@ pub fn function(funcname: &str, number: usize) -> String {
     */
     for _i in 0..number {
         asm += concat!(
-                "@0 \n", // Aレジスタに0を入れる
-                "D=A \n", // Dレジスタに移す
+                "@0 \n",    // Aレジスタに0を入れる
+                "D=A \n",   // Dレジスタに移す
                 "@SP \n",
-                "A=M \n", // SPレジスタの値をAレジスタに入れる
-                "M=D \n", // SPレジスタの値の番地に0を入れる
+                "A=M \n",   // SPレジスタの値をAレジスタに入れる
+                "M=D \n",   // SPレジスタの値の番地に0を入れる
                 inc!("SP"), // SPレジスタの値をインクリメントする
             );
     }
@@ -403,8 +403,8 @@ pub fn ret() -> String {
     // ARG[0]の番地にスタックの先頭を値を入れる
     asm += pop2d!("SP"); // スタックの先頭の値をDレジスタへ
     asm += "@ARG \n";
-    asm += "A=M \n"; // M[ARG]
-    asm += "M=D \n"; // M[M[ARG]]へDを入れる
+    asm += "A=M \n";     // M[ARG]
+    asm += "M=D \n";     // M[M[ARG]]へDを入れる
     
     // SPの値を呼び出し側の値に戻す
     // ARG[0]の番地の戻り値が入っているので、ARG[0]の番地+1をSPの値にする
@@ -432,7 +432,7 @@ pub fn ret() -> String {
     // return addressへジャンプする
     // return addressはR15の番地に入っている
     asm += "@R15 \n";
-    asm += "A=M \n"; // A=M[R15]
+    asm += "A=M \n";   // A=M[R15]
     asm += "0;JMP \n"; // return addressへジャンプ
 
     asm
@@ -446,11 +446,11 @@ pub fn push_constant(n: isize) -> String {
     */
     format!(
         concat!(
-            "@{n} \n", // Aレジスタにnを入れる
-            "D=A \n", // Dレジスタに移す
+            "@{n} \n",  // Aレジスタにnを入れる
+            "D=A \n",   // Dレジスタに移す
             "@SP \n",
-            "A=M \n", // SPレジスタの値をAレジスタに入れる
-            "M=D \n", // SPレジスタの値の番地にnを入れる
+            "A=M \n",   // SPレジスタの値をAレジスタに入れる
+            "M=D \n",   // SPレジスタの値の番地にnを入れる
             inc!("SP"), // SPレジスタの値をインクリメントする
         ), n=n)
 }
@@ -522,8 +522,8 @@ pub fn push_static(index: isize, filename: &str) -> String {
         "@{}.{n} \n",
         "D=M \n",
         "@SP \n",
-        "A=M \n", // SPレジスタの値をAレジスタに入れる
-        "M=D \n", // SPレジスタの値の番地にnを入れる
+        "A=M \n",   // SPレジスタの値をAレジスタに入れる
+        "M=D \n",   // SPレジスタの値の番地にnを入れる
         inc!("SP"), // SPレジスタの値をインクリメントする
     ), filename, n=index)
 }
@@ -547,7 +547,7 @@ mod test {
             "@SP \n",
             "M=M-1 \n", // SPレジスタの値をデクリメント
             "A=M \n", 
-            "D=M \n", // Dレジスタに数値を入れる
+            "D=M \n",   // Dレジスタに数値を入れる
             "@SP \n",
             "M=M-1 \n", // 再びSPレジスタの値をデクリメント
             "A=M \n",
@@ -562,11 +562,11 @@ mod test {
     fn test_push_constant() {
         let n = 5;
         let asm = format!(concat!(
-            "@{n} \n", // Aレジスタにnを入れる
-            "D=A \n", // Dレジスタに移す
+            "@{n} \n",  // Aレジスタにnを入れる
+            "D=A \n",   // Dレジスタに移す
             "@SP \n",
-            "A=M \n", // SPレジスタの値をAレジスタに入れる
-            "M=D \n", // SPレジスタの値の番地にnを入れる
+            "A=M \n",   // SPレジスタの値をAレジスタに入れる
+            "M=D \n",   // SPレジスタの値の番地にnを入れる
             "@SP \n",
             "M=M+1 \n", // SPレジスタの値をインクリメントする
         ), n=n).to_string();
