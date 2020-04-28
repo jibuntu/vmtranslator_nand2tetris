@@ -13,8 +13,6 @@ mod symbol_manager;
 use symbol_manager::SymbolManager;
 
 /// VMコマンドをHackのアセンブリコードに変換する。
-/// `CommandType::{LAVEL, GOTO, IF, FUNCTION, RETURN, CALL}`に対応する部分は
-/// まだ実装しなくてよい
 pub struct CodeWriter<W> {
     filename: String,
     sm: SymbolManager,
